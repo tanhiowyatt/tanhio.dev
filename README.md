@@ -10,7 +10,7 @@
 &nbsp;
 
 <div align="center">
-  <img src="pics/tanhio.dev.png" alt="tanhio.dev logo" width="150" height="auto" />
+  <img src="pics/tanhio.dev.png" alt="tanhio.dev logo" width="350" height="auto" />
 </div>
 
 <h3 align="center">
