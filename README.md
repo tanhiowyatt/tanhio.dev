@@ -3,7 +3,7 @@
 <div align="center">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Issues](https://img.shields.io/github/issues/tanhiowyatt/tanhiowyatt-site)](https://github.com/tanhiowyatt/tanhiowyatt-site/issues)
+[![Issues](https://img.shields.io/github/issues/tanhiowyatt/tanhio.dev)](https://github.com/tanhiowyatt/tanhio.dev/issues)
 
 </div>
 
