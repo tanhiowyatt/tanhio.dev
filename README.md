@@ -99,7 +99,8 @@ The project maintains a comprehensive test suite in the `tests/` directory.
 Production Nginx configuration is available at [`infra/nginx.conf`](./infra/nginx.conf).
 
 **Key Features:**
-- **Subdomains**: `tanhio.dev`, `blog.tanhio.dev`, `cv.tanhio.dev`
+- **Subdomains**: `tanhio.dev`, `cyanide.tanhio.dev`, `cv.tanhio.dev`
+- **Path-based**: Blog is integrated at `tanhio.dev/blog`
 - **Security Headers**: HSTS, CSP, X-Frame-Options
 - **Caching**: Aggressive caching (1 year) for static assets
 

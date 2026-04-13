@@ -1,0 +1,93 @@
+site_name: Cyanide Honeypot Documentation
+site_description: A medium-interaction SSH and Telnet honeypot with ML-based anomaly detection.
+site_author: tanhiowyatt
+
+repo_name: tanhiowyatt/cyanide-honeypot
+repo_url: https://github.com/tanhiowyatt/cyanide-honeypot
+edit_uri: edit/main/docs/
+docs_dir: docs
+
+theme:
+  name: material
+  logo: https://raw.githubusercontent.com/tanhiowyatt/cyanide-honeypot/main/src/cyanide/assets/branding/name.png
+  favicon: https://raw.githubusercontent.com/tanhiowyatt/cyanide-honeypot/main/src/cyanide/assets/branding/logo.png
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - mermaid2
+
+nav:
+  - Home: index.md
+  - User Guide:
+    - Quick Start: user-reference/QuickStart.md
+    - Advanced Configuration: user-reference/AdvancedUsage.md
+    - SIEM Integrations: user-reference/Integrations.md
+  - Developer Reference:
+    - Overview: developer-reference/core/index.md
+    - Core Architecture:
+      - Execution Loop: developer-reference/core/core.md
+      - Advanced Features: developer-reference/core/advanced_features.md
+      - Profile Caching: developer-reference/core/caching.md
+      - Stabilization: developer-reference/core/stabilization_notes.md
+    - Virtual Filesystem (VFS):
+      - VFS Overview: developer-reference/vfs/index.md
+      - VFS Internals: developer-reference/vfs/vfs.md
+      - Shell Emulator: developer-reference/vfs/shell_emulator.md
+      - Profiles Guide: developer-reference/vfs/profiles_guide.md
+    - Networking:
+      - Net Architecture: developer-reference/networking/index.md
+      - Protocol Handling: developer-reference/networking/network.md
+      - Hardening: developer-reference/networking/hardening.md
+    - Services:
+      - Service Overview: developer-reference/services/index.md
+      - SSH Handler: developer-reference/services/ssh.md
+      - Telnet Handler: developer-reference/services/telnet.md
+    - ML & Analytics:
+      - ML Overview: developer-reference/ml-analytics/index.md
+      - Detection Logic: developer-reference/ml-analytics/ml.md
+    - Tooling & Operations:
+      - Tooling Overview: developer-reference/tooling/index.md
+      - Operations Guide: developer-reference/tooling/operations.md
+    - Testing:
+      - Test Overview: developer-reference/tests/index.md
+      - Manual Testing: developer-reference/tests/manual.md
+  - Translations:
+    - English (ENG): project-overview.md
+    - Russian (RU): translations/readme-ru.md
+    - Polish (PL): translations/readme-pl.md
+
+copyright: Copyright &copy; 2026 tanhiowyatt
