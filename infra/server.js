@@ -62,6 +62,7 @@ blogApp.get('*', (req, res) => {
 const cyanideApp = express();
 // Serve from 'site' directory (built by mkdocs) or 'docs' temporarily
 const cyanidePath = path.join(__dirname, '../sites/cyanide/site');
+cyanideApp.use('/pics', express.static(path.join(__dirname, '../sites/main/pics')));
 cyanideApp.use(express.static(cyanidePath));
 cyanideApp.get('*', (req, res) => {
   res.sendFile(path.join(cyanidePath, 'index.html'), (err) => {

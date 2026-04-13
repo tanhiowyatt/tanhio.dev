@@ -10,7 +10,7 @@ docs_dir: docs
 theme:
   name: material
   logo: https://raw.githubusercontent.com/tanhiowyatt/cyanide-honeypot/main/src/cyanide/assets/branding/name.png
-  favicon: https://raw.githubusercontent.com/tanhiowyatt/cyanide-honeypot/main/src/cyanide/assets/branding/logo.png
+  favicon: pics/favicon.ico
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default

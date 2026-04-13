@@ -1,0 +1,56 @@
+name: CI Testing
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  security:
+    name: Security Scan (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Semgrep
+        run: semgrep ci --config auto
+
+  links:
+    name: Link Checker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for broken links
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: --exclude-mail --verbose --no-progress './**/*.md' './**/*.html'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  integration:
+    name: Server Integration Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Start Server and Check Endpoints
+        run: |
+          node infra/server.js &
+          # Wait for server to be ready
+          npx wait-on http://localhost:5173 --timeout 30000
+          # Test main endpoints
+          curl -f http://localhost:5173/
+          curl -f http://localhost:5173/blog
+          curl -f http://localhost:5173/app
+          curl -f http://localhost:5173/projects
