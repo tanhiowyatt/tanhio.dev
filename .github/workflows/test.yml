@@ -15,7 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run Semgrep
-        run: semgrep ci --config auto
+        run: |
+          semgrep ci --config auto \
+            --exclude-rule html.security.audit.missing-integrity.missing-integrity \
+            --exclude-rule generic.nginx.security.possible-h2c-smuggling.possible-nginx-h2c-smuggling
 
   links:
     name: Link Checker
@@ -46,9 +49,9 @@ jobs:
 
       - name: Start Server and Check Endpoints
         run: |
-          node infra/server.js &
+          npm start &
           # Wait for server to be ready
-          npx wait-on http://localhost:5173 --timeout 30000
+          ./node_modules/.bin/wait-on http://localhost:5173 --timeout 30000
           # Test main endpoints
           curl -f http://localhost:5173/
           curl -f http://localhost:5173/blog

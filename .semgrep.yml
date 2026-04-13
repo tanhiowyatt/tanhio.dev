@@ -1,0 +1,8 @@
+rules:
+  - id: html.security.audit.missing-integrity.missing-integrity
+    patterns:
+      - pattern: <link ... />
+      - pattern-not: <link rel="canonical" ... />
+    message: "External resource missing integrity attribute. (Canonical links are excluded)"
+    severity: WARNING
+    languages: [html]
