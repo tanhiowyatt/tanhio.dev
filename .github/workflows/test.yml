@@ -123,7 +123,7 @@ jobs:
         uses: bridgecrewio/checkov-action@master
         with:
           directory: ./infra
-          framework: nginx
+          framework: all
           soft_fail: false
           quiet: true
 
@@ -142,12 +142,6 @@ jobs:
       - name: Audit URLs using Lighthouse
         uses: treosh/lighthouse-ci-action@v12
         with:
-          urls: |
-            http://localhost:5173/
-            http://localhost:5173/projects
+          # Конфигурация берется из .lighthouserc.js
           uploadArtifacts: true
           temporaryPublicStorage: true
-          # Мы запускаем сервер во время теста
-          serverCommand: npm start
-          waitOn: http://localhost:5173
-          waitOnTimeout: 30000
