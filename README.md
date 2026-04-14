@@ -10,7 +10,7 @@
 &nbsp;
 
 <div align="center">
-  <img src="pics/tanhio.dev.png" alt="tanhio.dev logo" width="350" height="auto" />
+  <img src="sites/main/pics/tanhio.dev.png" alt="tanhio.dev logo" width="350" height="auto" />
 </div>
 
 <h3 align="center">
@@ -36,7 +36,7 @@
 
 This is the source code for [tanhio.dev](https://tanhio.dev), a personal website and blog built with vanilla HTML/JS and Tailwind CSS. It is designed to be lightweight, secure, and privacy-focused.
 
-![Screenshot](pics/tanhio-20-01-2026.png)
+![Screenshot](sites/main/pics/tanhio-20-01-2026.png)
 ## Features
 
 - **Static Architecture**: Fast and secure static HTML files.
@@ -117,14 +117,17 @@ Production Nginx configuration is available at [`infra/nginx.conf`](./infra/ngin
 ## Project Structure
 
 ```
-├── assets/          # Static assets (CSS, JS, Images)
-│   ├── styles/      # Tailwind input/output CSS
-│   └── components/  # Modular JS components
-├── blog/            # Blog posts
-├── files/           # Public downloads (CV, GPG keys)
-├── infra/           # Server Infrastructure (Nginx)
-├── partials/        # HTML inclusions (Header, Footer)
-├── tests/           # Test suites (Unit, E2E)
-├── index.html       # Landing page
+├── infra/           # Server Infrastructure (Nginx/Node.js)
+├── sites/           # Site-specific content
+│   ├── main/        # Primary website (tanhio.dev)
+│   │   ├── assets/  # JS and styles
+│   │   ├── blog/    # Content files
+│   │   ├── pics/    # Images and icons
+│   │   └── partials/# HTML inclusions
+│   ├── blog/        # Blog platform (if separate)
+│   └── cyanide/     # Documentation site
+├── tests/           # Test suites (Unit, E2E, Security)
+├── index.html       # Landing page (root)
+├── package.json
 └── tailwind.config.js
 ```
