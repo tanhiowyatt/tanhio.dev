@@ -5,6 +5,7 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   security:
@@ -16,9 +17,30 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run Semgrep
         run: |
-          semgrep ci --config auto \
+          semgrep ci --config auto --config p/nginx --config p/security-audit \
             --exclude-rule html.security.audit.missing-integrity.missing-integrity \
             --exclude-rule generic.nginx.security.possible-h2c-smuggling.possible-nginx-h2c-smuggling
+
+  audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+
+  secrets:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ""
+          head: ${{ github.ref_name }}
+          extra_args: --debug --only-verified
 
   links:
     name: Link Checker
@@ -31,6 +53,40 @@ jobs:
           args: --exclude-mail --verbose --no-progress './**/*.md' './**/*.html'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  tests:
+    name: Run Full Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies (Root)
+        run: npm install
+
+      - name: Install dependencies (Tests)
+        run: |
+          cd tests
+          npm install
+
+      - name: Install Playwright Browsers
+        run: |
+          cd tests
+          npx playwright install --with-deps
+
+      - name: Start Server and Run Tests
+        run: |
+          npm start &
+          # Wait for server to be ready
+          ./node_modules/.bin/wait-on http://localhost:5173 --timeout 30000
+          # Run tests
+          cd tests
+          npm test
 
   integration:
     name: Server Integration Test
@@ -57,3 +113,41 @@ jobs:
           curl -f http://localhost:5173/blog
           curl -f http://localhost:5173/app
           curl -f http://localhost:5173/projects
+
+  iac_security:
+    name: IaC Security (Checkov)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkov GitHub Action
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: ./infra
+          framework: nginx
+          soft_fail: false
+          quiet: true
+
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm install
+      - name: Audit URLs using Lighthouse
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            http://localhost:5173/
+            http://localhost:5173/projects
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          # Мы запускаем сервер во время теста
+          serverCommand: npm start
+          waitOn: http://localhost:5173
+          waitOnTimeout: 30000

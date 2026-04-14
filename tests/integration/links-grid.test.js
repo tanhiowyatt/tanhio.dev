@@ -2,11 +2,11 @@
  * Integration Tests for Links Grid Component
  */
 
-const linksGrid = require('../../assets/components/links-grid.js');
+const linksGrid = require('../../sites/main/assets/components/links-grid.js');
 
 describe('Links Grid Integration', () => {
   beforeEach(() => {
-    document.body.textContent = `
+    document.body.innerHTML = `
       <section id="links">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div class="link-card square" style="width: 200px;">

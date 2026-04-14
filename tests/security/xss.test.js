@@ -2,7 +2,7 @@
  * XSS Protection Tests
  */
 
-const SecurityUtils = require('../../assets/utils/security.js');
+const SecurityUtils = require('../../sites/main/assets/utils/security.js');
 
 describe('XSS Protection Tests', () => {
   test('should prevent script injection via textContent', () => {

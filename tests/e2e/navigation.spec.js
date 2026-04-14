@@ -6,7 +6,7 @@ const { test, expect } = require('@playwright/test');
 
 test.describe('Site Navigation', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:8000/index.html');
+    await page.goto('http://localhost:5173/');
   });
 
   test('should load main page', async ({ page }) => {
@@ -26,7 +26,7 @@ test.describe('Site Navigation', () => {
 
 test.describe('Links Grid', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:8000/index.html');
+    await page.goto('http://localhost:5173/');
   });
 
   test('should display link cards', async ({ page }) => {

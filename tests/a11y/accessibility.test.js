@@ -5,7 +5,7 @@
 describe('Accessibility Tests', () => {
   beforeEach(() => {
     document.documentElement.setAttribute('lang', 'en');
-    document.body.textContent = `
+    document.body.innerHTML = `
       <header>
         <nav>
           <a href="/" aria-label="Home">Home</a>
@@ -21,7 +21,7 @@ describe('Accessibility Tests', () => {
   });
 
   afterEach(() => {
-    document.body.textContent = '';
+    document.body.innerHTML = '';
   });
 
   test('should have proper lang attribute', () => {
