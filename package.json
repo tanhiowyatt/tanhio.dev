@@ -13,8 +13,8 @@
     "test:coverage": "cd tests && npm run test:coverage",
     "test:watch": "cd tests && npm run test:watch",
     "start": "node infra/server.js",
-    "build:css": "tailwindcss -i ./assets/styles/tailwind.css -o ./assets/styles/output.css",
-    "watch:css": "tailwindcss -i ./assets/styles/tailwind.css -o ./assets/styles/output.css --watch"
+    "build:css": "tailwindcss -i ./sites/main/assets/styles/tailwind.css -o ./sites/main/assets/styles/output.css",
+    "watch:css": "tailwindcss -i ./sites/main/assets/styles/tailwind.css -o ./sites/main/assets/styles/output.css --watch"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",

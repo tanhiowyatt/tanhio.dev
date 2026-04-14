@@ -1,10 +1,12 @@
-name: CI Testing
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  repository_dispatch:
+    types: [ docs_updated ]
   workflow_dispatch:
 
 jobs:
@@ -142,6 +144,42 @@ jobs:
       - name: Audit URLs using Lighthouse
         uses: treosh/lighthouse-ci-action@v12
         with:
-          # Конфигурация берется из .lighthouserc.js
           uploadArtifacts: true
           temporaryPublicStorage: true
+
+  deploy:
+    name: Deploy Application
+    needs: [security, audit, secrets, links, tests, integration, iac_security, lighthouse]
+    if: github.event_name == 'push' || github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+
+      - name: Deploy to Production via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /var/www/tanhio.dev || exit
+            git pull origin main
+            echo "Updating documentation from cyanide-honeypot..."
+            mkdir -p temp_docs
+            git clone --depth 1 https://github.com/tanhiowyatt/cyanide-honeypot.git temp_docs
+            rm -rf sites/cyanide/docs
+            mkdir -p sites/cyanide/docs
+            cp -r temp_docs/docs/* sites/cyanide/docs/
+            rm -rf temp_docs
+            mkdocs build -f sites/cyanide/mkdocs.yml
+            npm install --production
+            npm run build:css
+            pm2 restart tanhio-site || pm2 start infra/server.js --name "tanhio-site"
+            pm2 status
