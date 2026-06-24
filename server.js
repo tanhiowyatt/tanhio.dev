@@ -84,7 +84,7 @@ app.use(helmet({
       styleSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
       fontSrc: ["'self'", "data:"],
       imgSrc: ["'self'", "data:", "https:", "https://www.google-analytics.com"],
-      connectSrc: ["'self'", "https://www.google-analytics.com"],
+      connectSrc: ["'self'", "https://www.google-analytics.com", "https://vitals.vercel-insights.com"],
       frameAncestors: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],

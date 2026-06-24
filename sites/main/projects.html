@@ -30,7 +30,7 @@
 
   <!-- Content Security Policy -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com; base-uri 'self'; form-action 'self';">
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com https://vitals.vercel-insights.com; base-uri 'self'; form-action 'self';">
 
   <!-- Tailwind -->
   <!-- Bootstrap Icons -->
@@ -50,6 +50,7 @@
   <script defer src="assets/components/includes.js"></script>
   <script defer src="assets/components/mobile-menu.js"></script>
   <script defer src="assets/components/links-grid.js"></script>
+  <script defer src="assets/components/vercel-analytics.js"></script>
 
   <link rel="stylesheet" href="assets/styles/output.css" />
 </head>
