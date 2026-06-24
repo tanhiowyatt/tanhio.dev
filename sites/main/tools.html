@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="EN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>tanhiowyatt — Security Engineer</title>
+
+  <!-- Favicons -->
+  <link rel="icon" href="pics/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="pics/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="pics/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="pics/favicon-16.png">
+  <link rel="apple-touch-icon" href="pics/apple-touch-icon.png">
+  <link rel="manifest" href="pics/site.webmanifest">
+  <meta name="theme-color" content="#0B0B0F">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="tanhiowyatt — Tools">
+  <meta property="og:description" content="Security Engineer focusing on penetration testing. ">
+  <meta property="og:url" content="https://tanhio.dev">
+  <meta property="og:site_name" content="tanhiowyatt">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://tanhio.dev/pics/preview.png?v=3">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="twitter:image" content="https://tanhio.dev/pics/preview.png?v=3">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:alt" content="Tools by tanhiowyatt">
+  <link rel="canonical" href="/tools">
+
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://unpkg.com; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://unpkg.com https://www.googletagmanager.com https://www.google-analytics.com; base-uri 'self'; form-action 'self';">
+
+  <!-- Tailwind -->
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" />
+  <!-- Ensure Bootstrap Icons load properly -->
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="assets/site.css" />
+  <link rel="stylesheet" href="assets/styles/links-grid.css" />
+
+  <!-- Modular JavaScript Components -->
+  <script src="assets/vendor/js/purify.min.js"
+    integrity="sha384-KI2VFGKRhVDym1z+XNqQxgWpLJ8egX+ITfvSY8iWdGZ86B1qIK7/DXPGncRhbK2w"
+    crossorigin="anonymous"></script>
+  <script defer src="assets/utils/security.js"></script>
+  <script defer src="assets/utils/sanitize-html.js"></script>
+  <script defer src="assets/utils/click-sound.js"></script>
+  <script defer src="assets/components/includes.js"></script>
+  <script defer src="assets/components/mobile-menu.js"></script>
+
+  <style>
+    /* Page specific overrides only */
+    :root {
+      --tile: 240px;
+    }
+
+    .link-card.square {
+      height: var(--tile);
+    }
+  </style>
+  <link rel="stylesheet" href="assets/styles/output.css" />
+</head>
+
+<body>
+
+  <!-- ===================== HEADER (include) ===================== -->
+  <div data-include="partials/header.html"></div>
+
+  <!-- ===================== LINKS ===================== -->
+  <section id="links" class="relative section links-gap">
+    <div class="mx-auto max-w-5xl px-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+        <div class="link-card square md:col-start-1">
+          <a href="https://send.tanhio.dev" target="_blank" rel="noopener" aria-label="Send" class="stretched-link"></a>
+          <div class="logo-badge" aria-hidden="true"><i class="bi bi-file-arrow-up-fill" aria-hidden="true"></i></div>
+          <div>
+            <p class="uppercase tracking-wide text-[10px] text-slate-400">files</p>
+            <h3 class="text-[15px] font-semibold">send</h3>
+          </div>
+        </div>
+
+        <div class="link-card square">
+          <a href="https://docs.tanhio.dev" target="_blank" rel="noopener" aria-label="docmost"
+            class="stretched-link"></a>
+          <div class="logo-badge" aria-hidden="true"><i class="bi bi-stickies-fill" aria-hidden="true"></i></div>
+          <div>
+            <p class="uppercase tracking-wide text-[10px] text-slate-400">notes</p>
+            <h3 class="text-[15px] font-semibold">docmost</h3>
+          </div>
+        </div>
+
+        <div class="link-card square">
+          <a href="https://elem.tanhio.dev" target="_blank" rel="noopener" aria-label="element"
+            class="stretched-link"></a>
+          <div class="logo-badge" aria-hidden="true"><i class="bi bi-chat-dots-fill" aria-hidden="true"></i></div>
+          <div>
+            <p class="uppercase tracking-wide text-[10px] text-slate-400">chat</p>
+            <h3 class="text-[15px] font-semibold">element</h3>
+          </div>
+        </div>
+
+        <div class="link-card square">
+          <a href="https://links.tanhio.dev" target="_blank" rel="noopener" aria-label="links"
+            class="stretched-link"></a>
+          <div class="logo-badge" aria-hidden="true"><i class="bi bi-link-45deg" aria-hidden="true"></i></div>
+          <div>
+            <p class="uppercase tracking-wide text-[10px] text-slate-400">links</p>
+            <h3 class="text-[15px] font-semibold">links</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ===================== FOOTER (include) ===================== -->
+  <div data-include="partials/footer.html"></div>
+
+  <script>
+    (function () {
+      const links = document.getElementById('links');
+      let lastTile = null, rafId = null;
+
+      function setTileSize() {
+        if (!links) return;
+        const probe = links.querySelector('.link-card.square');
+        if (!probe) return;
+        const w = Math.round(probe.getBoundingClientRect().width);
+        if (lastTile === w) return;
+        lastTile = w;
+        links.style.setProperty('--tile', w + 'px');
+      }
+      function schedule() {
+        if (rafId) return;
+        rafId = requestAnimationFrame(() => {
+          rafId = null;
+          setTileSize();
+        });
+      }
+
+      globalThis.addEventListener('resize', schedule);
+      document.addEventListener('DOMContentLoaded', schedule);
+      globalThis.addEventListener('load', schedule);
+      if (document.fonts) { document.fonts.ready.then(schedule).catch(() => { }); }
+      if ('ResizeObserver' in globalThis) {
+        const grid = links?.querySelector('.grid');
+        if (grid) { new ResizeObserver(schedule).observe(grid); }
+      }
+    })();
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('#links .link-card').forEach((el) => {
+        el.addEventListener('mousemove', (e) => {
+          const r = el.getBoundingClientRect();
+          el.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+          el.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+        });
+        el.addEventListener('mouseleave', () => { el.style.removeProperty('--mx'); el.style.removeProperty('--my'); });
+      });
+    });
+  </script>
+</body>
+
+</html>

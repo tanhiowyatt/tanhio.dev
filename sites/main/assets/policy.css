@@ -1,0 +1,18 @@
+/* Policy/Terms pages specific styles */
+
+.policy-body {
+  hyphens: auto;
+  -webkit-hyphens: auto;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.policy-body p,
+.policy-body ul,
+.policy-body ol {
+  width: 100%;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+

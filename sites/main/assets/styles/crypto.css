@@ -1,0 +1,72 @@
+.addr {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  color: #cbd5e1;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-break: anywhere;
+  white-space: normal;
+  padding-right: 56px;
+  display: block;
+}
+
+.addr-row {
+  position: relative;
+  min-height: 34px;
+}
+
+.addr-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+}
+
+.copy-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 34px;
+  padding: 0;
+  border-radius: .6rem;
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: #0f172a;
+  color: #dbe4ff;
+  box-shadow: 0 3px 10px rgba(2, 6, 23, .45);
+  cursor: pointer;
+  transition: filter var(--speed) var(--ease);
+}
+
+.copy-btn:hover {
+  filter: brightness(1.1);
+}
+
+.copy-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.stub-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  background: rgba(10, 15, 34, .92);
+  color: #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, .12);
+  padding: .6rem .9rem;
+  border-radius: .75rem;
+  box-shadow: 0 10px 24px rgba(2, 6, 23, .55);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s var(--ease);
+}
+
+.stub-toast.show {
+  opacity: 1;
+}
+

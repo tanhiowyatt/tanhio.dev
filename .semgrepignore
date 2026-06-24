@@ -1,0 +1,8 @@
+# Ignore false positive integrity checks for canonical links and local resources
+html.security.audit.missing-integrity.missing-integrity
+# Ignore tests because they contain intentionally malicious strings for validation
+tests/
+node_modules/
+dist/
+site/
+

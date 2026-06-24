@@ -1,0 +1,70 @@
+#footer {
+    background: transparent;
+    color: #fff;
+    margin-top: 8rem;
+    /* Increased spacing from content */
+}
+
+.footer-nav-col h4 {
+    font-family: 'Open Sans', system-ui, -apple-system, sans-serif;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+}
+
+.footer-nav-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-nav-col a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s var(--ease, ease);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+/* Bento card purple color on hover */
+.footer-nav-col a:hover {
+    color: #4b68ff;
+    transform: translateX(4px);
+}
+
+#footer .brand-avatar {
+    background-image: var(--brand-image);
+    background-size: cover;
+    background-position: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    #footer .grid-cols-12 {
+        gap: 3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    #footer .grid-cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem 1rem;
+    }
+
+    #footer {
+        padding-top: 3rem;
+        padding-bottom: 2rem;
+        margin-top: 4rem;
+    }
+
+    .footer-nav-col h4 {
+        margin-bottom: 1rem;
+        margin-top: 2rem;
+    }
+}
