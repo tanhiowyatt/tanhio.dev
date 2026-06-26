@@ -14,7 +14,8 @@
 html {
   scroll-behavior: smooth;
   min-height: 100%;
-  background-color: transparent;
+  background-color: #111110;
+  background: var(--site-bg-color);
 }
 
 body {
