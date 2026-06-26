@@ -1,0 +1,19 @@
+/* CSS Variables - extracted from inline styles */
+
+:root {
+  --ease: cubic-bezier(.22, .61, .36, 1);
+  --speed: 240ms;
+  --section-py: 5.25rem;
+  --brand-image: url('/pics/bullseye.svg');
+  --portrait-image: url('/pics/portrait.jpeg');
+  --tile: 280px; 
+  --lead-max: 520px;  
+  --portrait-w: 300px; 
+  --portrait-h: 300px; 
+}
+
+@media (max-width: 768px) {
+  :root {
+    --tile: 160px;
+  }
+}

@@ -1,0 +1,211 @@
+.nav-pill {
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, .45);
+    border: 1px solid rgba(255, 255, 255, .1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.brand-avatar {
+    width: 20px;
+    height: 20px;
+    display: block;
+    object-fit: contain;
+}
+
+.dropdown-menu {
+    perspective: 1000px;
+}
+
+.dropdown-content {
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+.dropdown-icon-wrapper {
+    transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-item i {
+    font-size: 16px;
+    transition: color 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+
+.dropdown-item:hover .dropdown-icon-wrapper {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dropdown-item:hover .dropdown-icon-wrapper i {
+    color: white;
+    opacity: 1;
+}
+
+.dropdown-item:hover span {
+    color: white;
+}
+
+.mobile-accordion-content {
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-accordion-trigger[aria-expanded="true"]+.mobile-accordion-content {
+    max-height: 500px;
+}
+
+.mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    /* Принудительная растяжка */
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+
+    /* Фон меню */
+    background-color: #111110;
+
+    /* Убираем лишние отступы, используем padding для контента, а не для всего блока */
+    padding: 0;
+
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-menu .flex-1 {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobile-menu.menu-open {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.mobile-menu .overflow-y-auto {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.mobile-menu .overflow-y-auto::-webkit-scrollbar {
+    display: none;
+}
+
+.mobile-menu-button {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    z-index: 1100;
+}
+
+.burger-bars {
+    width: 24px;
+    height: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.burger-bars span {
+    width: 100%;
+    height: 2px;
+    background-color: currentColor;
+    border-radius: 2px;
+    transition: all 0.3s var(--ease);
+}
+
+.mobile-menu-button.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+
+.mobile-menu-button.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-menu-button.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
+.mobile-menu-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.mobile-menu li {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mobile-menu.menu-open li {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mobile-menu.menu-open li:nth-child(1) {
+    transition-delay: 0.2s;
+}
+
+.mobile-menu.menu-open li:nth-child(2) {
+    transition-delay: 0.25s;
+}
+
+.mobile-menu.menu-open li:nth-child(3) {
+    transition-delay: 0.3s;
+}
+
+.mobile-menu.menu-open li:nth-child(4) {
+    transition-delay: 0.35s;
+}
+
+.mobile-menu.menu-open li:nth-child(5) {
+    transition-delay: 0.4s;
+}
+
+[download="tanhiowyatt_CV.pdf"] {
+    animation: none !important;
+    box-shadow: none !important;
+}
+
+.mobile-accordion-content a {
+    color: #ffffff !important;
+    transition: background-color 0.2s var(--ease);
+}
+
+.mobile-accordion-content a i {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+.mobile-accordion-content a:active div,
+.mobile-accordion-content a:hover div {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
