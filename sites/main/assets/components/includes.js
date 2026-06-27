@@ -42,10 +42,11 @@
   }
 
   function ensureThemeColor() {
+    // Fallback: <meta name="theme-color"> задаёт цвет Dynamic Island / Control Center в iOS Safari
     if (document.querySelector('meta[name="theme-color"]')) return;
     const meta = document.createElement('meta');
     meta.name = 'theme-color';
-    meta.content = '#111110';
+    meta.content = '#111110'; // совпадает с --site-bg-color
     document.head.appendChild(meta);
   }
 
