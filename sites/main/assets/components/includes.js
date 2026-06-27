@@ -41,6 +41,14 @@
     }
   }
 
+  function ensureThemeColor() {
+    if (document.querySelector('meta[name="theme-color"]')) return;
+    const meta = document.createElement('meta');
+    meta.name = 'theme-color';
+    meta.content = '#111110';
+    document.head.appendChild(meta);
+  }
+
   async function loadIncludes() {
     const includes = document.querySelectorAll('[data-include]');
     const promises = Array.from(includes).map(async (el) => {
@@ -131,6 +139,7 @@
 
   if (typeof document !== 'undefined' && !globalThis.__TEST__) {
     const init = () => {
+      ensureThemeColor();
       loadIncludes();
       initCookieConsent();
     };

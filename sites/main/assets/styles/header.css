@@ -1,8 +1,22 @@
+/* Opaque composite of rgba(0,0,0,.45) over #111110 — Safari-safe, no scroll toggle */
+.ios-chrome-fill {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: env(safe-area-inset-top, 0px);
+    background-color: #111110;
+    z-index: 99999;
+    pointer-events: none;
+}
+
 .nav-pill {
+    background-color: #090908;
     backdrop-filter: blur(10px);
-    background: rgba(0, 0, 0, .45);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, .1);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    transition: none;
 }
 
 .brand-avatar {

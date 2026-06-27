@@ -331,8 +331,9 @@ header {
 }
 
 header .nav-pill {
+  background-color: #090908 !important;
   backdrop-filter: blur(10px) !important;
-  background: rgba(0, 0, 0, .45) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
   border: 1px solid rgba(255, 255, 255, .1) !important;
 }
 
