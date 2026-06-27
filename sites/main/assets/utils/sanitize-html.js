@@ -18,14 +18,14 @@ const ALLOWED_ATTR = [
 ];
 
 /**
- * Санитизировать HTML‑строку и вернуть строку.
+ * Sanitize an HTML string and return a sanitized string.
  */
 function sanitizeHTML(html, extraConfig) {
   if (typeof html !== 'string') {
     return '';
   }
 
-  // DOMPurify — основной путь (загружается через CDN)
+  // DOMPurify — primary path (loaded via vendor script)
   if (globalThis?.DOMPurify) {
     const config = extraConfig || {
       ALLOWED_TAGS: ALLOWED_TAGS,
@@ -54,14 +54,14 @@ function sanitizeHTML(html, extraConfig) {
     return tmp.innerHTML;
   }
 
-  // Безопасный текстовый fallback
+  // Safe text-only fallback
   const tmp = document.createElement('div');
   tmp.textContent = html;
   return tmp.innerHTML;
 }
 
 /**
- * Безопасно установить HTML через DOMParser + append().
+ * Safely set HTML via DOMParser + append().
  */
 function setSafeHTML(element, html, extraConfig) {
   if (!element) return;
@@ -76,7 +76,7 @@ function setSafeHTML(element, html, extraConfig) {
 }
 
 /**
- * Санитизация HTML из Markdown.
+ * Sanitize HTML produced from Markdown.
  */
 function sanitizeMarkdownHTML(html) {
   const markdownConfig = {

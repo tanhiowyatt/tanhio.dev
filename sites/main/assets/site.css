@@ -133,3 +133,14 @@ header {
 #cookie-consent-banner p {
   font-family: 'Open Sans', system-ui, sans-serif !important;
 }
+
+#cookie-consent-banner {
+  background-color: #090908 !important; /* solid background = header color, no transparency */
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+#cookie-consent-banner.cookie-hidden {
+  opacity: 0 !important;
+  visibility: hidden;
+  pointer-events: none;
+}

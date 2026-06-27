@@ -1,13 +1,30 @@
 <!DOCTYPE html>
+<!--
+  ╔══════════════════════════════════════════════════════════════════╗
+  ║  BLOG POST TEMPLATE                                              ║
+  ║                                                                  ║
+  ║  HOW TO USE:                                                     ║
+  ║  1. Copy this file → blog/YOUR-SLUG.html                         ║
+  ║  2. Replace all {{PLACEHOLDERS}} with real values                ║
+  ║  3. Add your MDX file → blog/posts/YOUR-SLUG.mdx                 ║
+  ║  4. Register in blog.js → posts[] array                          ║
+  ║  5. (Optional) Add cover → blog/images/YOUR-SLUG.png             ║
+  ║                                                                  ║
+  ║  Do NOT change anything in <body> — post-renderer.js             ║
+  ║  automatically loads content from the matching .mdx file.        ║
+  ╚══════════════════════════════════════════════════════════════════╝
+-->
 <html lang="EN">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#111110" />
-  <title>Blog Post — tanhiowyatt</title>
 
-  <!-- Favicons-->
+  <!-- ✏️ CHANGE: Page title shown in browser tab -->
+  <title>{{POST_TITLE}} — tanhiowyatt</title>
+
+  <!-- Favicons (do not change) -->
   <link rel="icon" href="../pics/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="../pics/favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="../pics/favicon-32.png">
@@ -15,27 +32,23 @@
   <link rel="apple-touch-icon" href="../pics/apple-touch-icon.png">
   <link rel="manifest" href="../pics/site.webmanifest">
 
-  <!-- Content Security Policy -->
+  <!-- Content Security Policy (do not change) -->
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' https://unpkg.com; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://unpkg.com https://vitals.vercel-insights.com; base-uri 'self'; form-action 'self';">
 
-            <link rel="canonical" href="/blog/post-template">
+  <!-- ✏️ CHANGE: Canonical URL → /blog/YOUR-SLUG (no trailing slash) -->
+  <link rel="canonical" href="/blog/{{POST_SLUG}}">
 
-      
-  <!-- Tailwind via CDN -->
-
-  <!-- Bootstrap Icons -->
+  <!-- Styles (do not change) -->
   <link rel="stylesheet" href="../assets/vendor/bootstrap-icons/bootstrap-icons.min.css" />
-  <link rel="preconnect" href="" />
-
-  <!-- Shared site CSS -->
   <link rel="stylesheet" href="../assets/site.css?v=34" />
-
-  <!-- Blog CSS -->
   <link rel="stylesheet" href="../assets/styles/blog.css?v=2" />
+  <link rel="stylesheet" href="../assets/styles/output.css" />
 
-  <!-- Modular JavaScript Components -->
-  <script src="../assets/vendor/js/purify.min.js" integrity="sha384-KI2VFGKRhVDym1z+XNqQxgWpLJ8egX+ITfvSY8iWdGZ86B1qIK7/DXPGncRhbK2w" crossorigin="anonymous"></script>
+  <!-- Scripts (do not change) -->
+  <script src="../assets/vendor/js/purify.min.js"
+    integrity="sha384-KI2VFGKRhVDym1z+XNqQxgWpLJ8egX+ITfvSY8iWdGZ86B1qIK7/DXPGncRhbK2w"
+    crossorigin="anonymous"></script>
   <script defer src="../assets/utils/security.js"></script>
   <script defer src="../assets/utils/sanitize-html.js"></script>
   <script defer src="../assets/utils/click-sound.js"></script>
@@ -43,29 +56,29 @@
   <script defer src="../assets/components/includes.js?v=5"></script>
   <script defer src="../assets/components/mobile-menu.js"></script>
   <script defer src="../assets/components/post-renderer.js"></script>
-  <link rel="stylesheet" href="../assets/styles/output.css" />
 
-  <meta name="title" content="Blog Post — tanhiowyatt">
-  <meta name="description" content="Blog post from tanhiowyatt">
+  <!-- ✏️ CHANGE: SEO meta tags -->
+  <meta name="title" content="{{POST_TITLE}} — tanhiowyatt">
+  <meta name="description" content="{{POST_EXCERPT}}">
 
-  <!-- Open Graph / Facebook / Telegram -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Blog Post — tanhiowyatt">
-  <meta property="og:description" content="Blog post from tanhiowyatt">
-  <meta property="og:url" content="https://tanhio.dev/blog/post-template/">
+  <!-- ✏️ CHANGE: Open Graph (Telegram, Facebook, iMessage previews) -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="{{POST_TITLE}} — tanhiowyatt">
+  <meta property="og:description" content="{{POST_EXCERPT}}">
+  <meta property="og:url" content="https://tanhio.dev/blog/{{POST_SLUG}}/">
   <meta property="og:site_name" content="tanhiowyatt">
   <meta property="og:locale" content="en_US">
   <meta property="og:image" content="https://tanhio.dev/pics/preview.png?v=3">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="960">
   <meta property="og:image:height" content="480">
-  <meta property="og:image:alt" content="Blog Post — tanhiowyatt">
+  <meta property="og:image:alt" content="{{POST_TITLE}} — tanhiowyatt">
 
-  <!-- X (Twitter) -->
+  <!-- ✏️ CHANGE: X / Twitter card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:url" content="https://tanhio.dev/blog/post-template/">
-  <meta name="twitter:title" content="Blog Post — tanhiowyatt">
-  <meta name="twitter:description" content="Blog post from tanhiowyatt">
+  <meta name="twitter:url" content="https://tanhio.dev/blog/{{POST_SLUG}}/">
+  <meta name="twitter:title" content="{{POST_TITLE}} — tanhiowyatt">
+  <meta name="twitter:description" content="{{POST_EXCERPT}}">
   <meta name="twitter:image" content="https://tanhio.dev/pics/preview.png?v=3">
 </head>
 
@@ -74,6 +87,7 @@
   <div data-include="../partials/header.html"></div>
 
   <!-- ===================== BLOG POST SECTION ===================== -->
+  <!-- Content is loaded automatically by post-renderer.js from the matching .mdx file -->
   <section class="section">
     <div class="mx-auto max-w-5xl px-4">
       <div class="blog-container">
@@ -84,20 +98,18 @@
 
         <article class="blog-post">
           <div id="blog-post-header" class="blog-post-header">
-            <!-- Post title and date will be loaded here -->
+            <!-- Post title and date rendered here by post-renderer.js -->
           </div>
           <div id="blog-post-content" class="blog-post-content">
-            <!-- Post content will be loaded here -->
+            <!-- Post body rendered here by post-renderer.js -->
           </div>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- ===================== FOOTER (include) ===================== -->
+  <!-- ===================== FOOTER ===================== -->
   <div data-include="../partials/footer.html"></div>
-  <!-- =================== END FOOTER =================== -->
-
 </body>
 
 </html>

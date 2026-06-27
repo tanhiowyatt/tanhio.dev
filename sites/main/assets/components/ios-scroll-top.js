@@ -1,15 +1,15 @@
 (function () {
   'use strict';
 
-  const THRESHOLD = 10; // px от верха документа — зона «начало страницы»
-  const CLASS = 'at-top'; // класс на <html>, включает iOS-стили header в mobile-ios.css
+  const THRESHOLD = 10; // px from top of document — "at top of page" zone
+  const CLASS = 'at-top'; // class on <html> that enables iOS header styles in mobile-ios.css
 
   function update() {
     document.documentElement.classList.toggle(CLASS, window.scrollY < THRESHOLD);
   }
 
   function bind() {
-    update(); // начальное состояние (важно после reload с середины)
+    update(); // set initial state (important after reload from mid-page)
 
     let ticking = false;
     window.addEventListener('scroll', () => {
@@ -22,7 +22,7 @@
     }, { passive: true });
 
     window.addEventListener('pageshow', update); // bfcache / reload
-    window.addEventListener('load', update);     // после восстановления scroll
+    window.addEventListener('load', update);     // after scroll position is restored
   }
 
   document.addEventListener('partialLoaded', (e) => {

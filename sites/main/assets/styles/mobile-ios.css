@@ -1,51 +1,51 @@
 /* =============================================================================
-   iOS Safari — фиксы для Dynamic Island / Control Center
-   Детект устройства: @supports (-webkit-touch-callout: none) — только iOS Safari
+   iOS Safari — fixes for Dynamic Island / Control Center
+   Detection: @supports (-webkit-touch-callout: none) — iOS Safari only
    ============================================================================= */
 
 @supports (-webkit-touch-callout: none) {
 
-  /* --- Фон документа ------------------------------------------------------- */
+  /* --- Document background -------------------------------------------------- */
 
   html {
-    background-color: #111110; /* Safari сэмплирует этот цвет при overscroll / pull-to-refresh */
+    background-color: #111110; /* Safari samples this color during overscroll / pull-to-refresh */
   }
 
-  /* Только зона Dynamic Island / status bar — не трогаем header и контент ниже */
+  /* Dynamic Island / status bar zone only — does not affect header or content below */
   html::before {
-    content: '';                              /* псевдо-элемент без DOM */
-    position: fixed;                          /* не двигается при скролле */
-    top: 0;                                   /* от верхнего края viewport */
-    left: 0;                                  /* на всю ширину */
+    content: '';                              /* pseudo-element with no DOM node */
+    position: fixed;                          /* doesn't move on scroll */
+    top: 0;                                   /* from the top of the viewport */
+    left: 0;                                  /* full width */
     right: 0;
     width: 100%;
-    height: env(safe-area-inset-top, 47px);   /* только safe-area, без лишней высоты */
-    background-color: #111110;                /* цвет фона сайта */
-    z-index: 99999;                           /* поверх контента, под системным UI */
-    pointer-events: none;                     /* не блокирует тапы */
+    height: env(safe-area-inset-top, 47px);   /* safe-area only, no extra height */
+    background-color: #111110;                /* matches site background color */
+    z-index: 99999;                           /* above content, below system UI */
+    pointer-events: none;                     /* doesn't block taps */
   }
 
   body {
-    background-color: #111110; /* дублируем фон на body */
-    opacity: 1;                /* без fade-in — иначе chrome просвечивает при загрузке */
-    animation: none;             /* отключаем fadeIn на iOS */
+    background-color: #111110; /* duplicate background on body */
+    opacity: 1;                /* no fade-in — otherwise chrome bleeds through on load */
+    animation: none;             /* disable fadeIn on iOS */
   }
 
   body.fade-out {
-    animation: fadeOut 0.3s var(--ease) forwards; /* fade-out при переходах сохраняем */
+    animation: fadeOut 0.3s var(--ease) forwards; /* keep fade-out on page transitions */
   }
 
-  /* --- Header — фон #111110 всегда (и at-top, и при скролле) -------------- */
+  /* --- Header — background #111110 always (both at-top and on scroll) ------- */
 
   header {
-    background-color: #111110; /* фон вокруг pill = цвет сайта; Safari сэмплирует его, не pill */
+    background-color: #111110; /* area around pill = site color; Safari samples this, not the pill */
   }
 
-  /* --- Nav pill — отдельный оттенок, но без backdrop-filter (иначе Safari-баг) --- */
+  /* --- Nav pill — distinct shade, but no backdrop-filter (causes Safari bug) -- */
 
   .nav-pill {
-    background-color: #090908;       /* визуально как rgba(0,0,0,.45) — pill выделяется на #111110 */
-    backdrop-filter: none;           /* blur был главной причиной «прозрачного» chrome */
+    background-color: #090908;       /* visually similar to rgba(0,0,0,.45) — pill stands out on #111110 */
+    backdrop-filter: none;           /* blur was the main cause of the "transparent" chrome bug */
     -webkit-backdrop-filter: none;
   }
 
@@ -55,30 +55,38 @@
     -webkit-backdrop-filter: none !important;
   }
 
-  /* --- Мобильное меню ------------------------------------------------------ */
+  /* --- Cookie Consent Banner ------------------------------------------------ */
+
+  #cookie-consent-banner {
+    background-color: #090908 !important;  /* solid background = header color; backdrop-filter doesn't work on iOS */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* --- Mobile menu ---------------------------------------------------------- */
 
   .mobile-menu {
-    padding-top: env(safe-area-inset-top);       /* контент ниже Dynamic Island */
-    padding-bottom: env(safe-area-inset-bottom); /* отступ над home indicator */
+    padding-top: env(safe-area-inset-top);       /* content below Dynamic Island */
+    padding-bottom: env(safe-area-inset-bottom); /* spacing above home indicator */
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
 
   .mobile-menu .flex-1 {
-    padding-top: 0; /* safe-area уже на .mobile-menu */
+    padding-top: 0; /* safe-area already applied on .mobile-menu */
   }
 
   .mobile-menu-close {
-    top: calc(env(safe-area-inset-top, 0px) + 24px); /* «×» ниже выреза камеры */
+    top: calc(env(safe-area-inset-top, 0px) + 24px); /* × button below camera notch */
   }
 
-  /* --- html.at-top — только layout у верха документа (ios-scroll-top.js) ----
-     Класс ставится при scrollY < 10. Убирает зазор top-4, hero не заезжает в chrome.
-     Фон #111110 уже задан выше — не дублируем.
+  /* --- html.at-top — layout at the top of the document (ios-scroll-top.js) ---
+     Class is set when scrollY < 10. Removes the top-4 gap, hero doesn't slide into chrome.
+     Background #111110 already set above — not duplicated here.
      ----------------------------------------------------------------------- */
 
   html.at-top header {
-    top: 0 !important; /* без зазора 16px у самого верха страницы */
+    top: 0 !important; /* no 16px gap at very top of page */
     padding-top: calc(env(safe-area-inset-top, 47px) + 0.75rem) !important;
   }
 }

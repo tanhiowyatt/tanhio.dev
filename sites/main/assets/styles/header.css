@@ -1,161 +1,161 @@
 /* =============================================================================
-   Header — навбар и мобильное меню (≤ 768px через .mobile-menu-button)
+   Header — navbar and mobile menu (≤ 768px via .mobile-menu-button)
    ============================================================================= */
 
-/* --- Nav pill (десктоп и мобилка) ---------------------------------------- */
+/* --- Nav pill (desktop and mobile) ---------------------------------------- */
 
 .nav-pill {
-    background-color: #090908;              /* непрозрачный tint pill; iOS-override в mobile-ios.css */
-    backdrop-filter: blur(10px);            /* стеклянный эффект на desktop */
-    -webkit-backdrop-filter: blur(10px);    /* webkit-префикс */
-    border: 1px solid rgba(255, 255, 255, .1); /* тонкая светлая обводка */
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* лёгкая тень под pill */
-    transition: none;                       /* без анимации фона — предотвращает мерцание */
+    background-color: #090908;              /* opaque tint pill; iOS override in mobile-ios.css */
+    backdrop-filter: blur(10px);            /* glass effect on desktop */
+    -webkit-backdrop-filter: blur(10px);    /* webkit prefix */
+    border: 1px solid rgba(255, 255, 255, .1); /* thin light border */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* light shadow under pill */
+    transition: none;                       /* no background animation — prevents flickering */
 }
 
 .brand-avatar {
-    width: 20px;           /* размер логотипа в header */
-    height: 20px;          /* квадратный avatar */
-    display: block;        /* убираем inline-gap под img */
-    object-fit: contain;   /* svg/logo вписывается без обрезки */
+    width: 20px;           /* logo size in header */
+    height: 20px;          /* square avatar */
+    display: block;        /* remove inline gap below img */
+    object-fit: contain;   /* svg/logo fits without cropping */
 }
 
 /* --- Dropdown (desktop) ---------------------------------------------------- */
 
 .dropdown-menu {
-    perspective: 1000px; /* 3D-перспектива для анимации выпадашки */
+    perspective: 1000px; /* 3D perspective for dropdown animation */
 }
 
 .dropdown-content {
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5); /* тень dropdown-панели */
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5); /* dropdown panel shadow */
 }
 
 .dropdown-icon-wrapper {
-    transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease); /* hover-анимация иконки */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* рамка иконки в dropdown */
+    transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease); /* icon hover animation */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* icon border in dropdown */
 }
 
 .dropdown-item i {
-    font-size: 16px;                                              /* размер bootstrap-icon */
-    transition: color 0.3s var(--ease), opacity 0.3s var(--ease); /* hover-анимация */
+    font-size: 16px;                                              /* bootstrap icon size */
+    transition: color 0.3s var(--ease), opacity 0.3s var(--ease); /* hover animation */
 }
 
 .dropdown-item:hover .dropdown-icon-wrapper {
-    background: rgba(255, 255, 255, 0.1);  /* подсветка фона иконки при hover */
-    border-color: rgba(255, 255, 255, 0.3); /* ярче рамка при hover */
+    background: rgba(255, 255, 255, 0.1);  /* icon background highlight on hover */
+    border-color: rgba(255, 255, 255, 0.3); /* brighter border on hover */
 }
 
 .dropdown-item:hover .dropdown-icon-wrapper i {
-    color: white;  /* иконка белая при hover */
-    opacity: 1;    /* полная непрозрачность */
+    color: white;  /* icon turns white on hover */
+    opacity: 1;    /* full opacity */
 }
 
 .dropdown-item:hover span {
-    color: white; /* текст пункта белый при hover */
+    color: white; /* item text turns white on hover */
 }
 
-/* --- Mobile accordion (внутри .mobile-menu) ------------------------------- */
+/* --- Mobile accordion (inside .mobile-menu) -------------------------------- */
 
 .mobile-accordion-content {
-    overflow: hidden;                                      /* скрываем содержимое при свёрнутом состоянии */
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* плавное раскрытие аккордеона */
+    overflow: hidden;                                      /* hide content when collapsed */
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* smooth accordion open */
 }
 
 .mobile-accordion-trigger[aria-expanded="true"]+.mobile-accordion-content {
-    max-height: 500px; /* достаточная высота для раскрытого блока */
+    max-height: 500px; /* sufficient height for expanded block */
 }
 
 /* --- Mobile menu overlay --------------------------------------------------- */
 
 .mobile-menu {
-    position: fixed;  /* поверх всего контента */
+    position: fixed;  /* above all content */
     inset: 0;         /* top/right/bottom/left: 0 */
-    z-index: 1000;    /* выше header (z-40) и контента */
+    z-index: 1000;    /* above header (z-40) and content */
 
-    width: 100vw;     /* на всю ширину viewport */
-    height: 100vh;    /* fallback-высота */
-    height: 100dvh;   /* dynamic viewport — корректно на iOS с адресной строкой */
+    width: 100vw;     /* full viewport width */
+    height: 100vh;    /* fallback height */
+    height: 100dvh;   /* dynamic viewport — correct on iOS with address bar */
 
-    background-color: #111110; /* сплошной фон меню = фон сайта */
+    background-color: #111110; /* solid menu background = site background */
 
-    padding: 0; /* safe-area задаётся в mobile-ios.css для iOS */
+    padding: 0; /* safe-area is set in mobile-ios.css for iOS */
 
-    backdrop-filter: blur(40px);         /* blur на desktop при открытом меню */
-    -webkit-backdrop-filter: blur(40px); /* webkit-префикс */
+    backdrop-filter: blur(40px);         /* blur on desktop when menu is open */
+    -webkit-backdrop-filter: blur(40px); /* webkit prefix */
 
-    visibility: hidden;  /* скрыто по умолчанию */
-    opacity: 0;          /* прозрачно по умолчанию */
-    transform: translateY(-100%); /* за экраном сверху */
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* анимация открытия/закрытия */
-    pointer-events: none; /* клики проходят сквозь закрытое меню */
-    display: flex;        /* flex-колонка: контент + кнопка CV */
+    visibility: hidden;  /* hidden by default */
+    opacity: 0;          /* transparent by default */
+    transform: translateY(-100%); /* off-screen above */
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* open/close animation */
+    pointer-events: none; /* clicks pass through closed menu */
+    display: flex;        /* flex column: content + CV button */
     flex-direction: column;
 }
 
 .mobile-menu .flex-1 {
-    padding-top: env(safe-area-inset-top);    /* desktop/fallback: отступ под notch */
-    padding-bottom: env(safe-area-inset-bottom); /* отступ над home indicator */
+    padding-top: env(safe-area-inset-top);    /* desktop/fallback: offset for notch */
+    padding-bottom: env(safe-area-inset-bottom); /* offset above home indicator */
 }
 
 .mobile-menu.menu-open {
-    visibility: visible;  /* показываем меню */
-    opacity: 1;           /* полностью непрозрачно */
-    transform: translateY(0); /* slide-in сверху */
-    pointer-events: auto; /* принимаем клики */
+    visibility: visible;  /* show menu */
+    opacity: 1;           /* fully opaque */
+    transform: translateY(0); /* slide in from top */
+    pointer-events: auto; /* accept clicks */
 }
 
 .mobile-menu .overflow-y-auto {
-    scrollbar-width: none;     /* Firefox: скрыть scrollbar */
-    -ms-overflow-style: none;  /* IE/Edge: скрыть scrollbar */
+    scrollbar-width: none;     /* Firefox: hide scrollbar */
+    -ms-overflow-style: none;  /* IE/Edge: hide scrollbar */
 }
 
 .mobile-menu .overflow-y-auto::-webkit-scrollbar {
-    display: none; /* WebKit: скрыть scrollbar */
+    display: none; /* WebKit: hide scrollbar */
 }
 
 /* --- Burger button --------------------------------------------------------- */
 
 .mobile-menu-button {
-    width: 44px;            /* Apple HIG: мин. tap-target 44×44 */
+    width: 44px;            /* Apple HIG: min tap target 44×44 */
     height: 44px;
-    display: flex;          /* центрируем иконку бургера */
+    display: flex;          /* center burger icon */
     align-items: center;
     justify-content: center;
-    background: transparent; /* без фона — виден pill под кнопкой */
-    border: none;           /* убираем default button border */
-    color: white;           /* цвет линий бургера */
+    background: transparent; /* no background — pill shows through */
+    border: none;           /* remove default button border */
+    color: white;           /* burger bar color */
     cursor: pointer;
-    z-index: 1100;          /* выше .mobile-menu при закрытии */
+    z-index: 1100;          /* above .mobile-menu when closing */
 }
 
 .burger-bars {
-    width: 24px;                 /* ширина иконки «три полоски» */
-    height: 18px;                /* высота иконки */
+    width: 24px;                 /* icon width */
+    height: 18px;                /* icon height */
     display: flex;
-    flex-direction: column;      /* полоски друг под другом */
-    justify-content: space-between; /* равномерный gap между полосками */
+    flex-direction: column;      /* bars stacked vertically */
+    justify-content: space-between; /* even gap between bars */
 }
 
 .burger-bars span {
-    width: 100%;                  /* полоска на всю ширину иконки */
-    height: 2px;                  /* толщина полоски */
-    background-color: currentColor; /* цвет = color родителя (white) */
-    border-radius: 2px;           /* скруглённые концы */
-    transition: all 0.3s var(--ease); /* анимация (если будет → X) */
+    width: 100%;                  /* bar spans full icon width */
+    height: 2px;                  /* bar thickness */
+    background-color: currentColor; /* color inherits from parent (white) */
+    border-radius: 2px;           /* rounded ends */
+    transition: all 0.3s var(--ease); /* animation (for future → X transform) */
 }
 
 .mobile-menu-button.active {
-    opacity: 0;           /* скрываем бургер когда меню открыто */
-    pointer-events: none; /* не перехватываем клики */
+    opacity: 0;           /* hide burger when menu is open */
+    pointer-events: none; /* don't intercept clicks */
 }
 
 /* --- Close button (×) ------------------------------------------------------ */
 
 .mobile-menu-close {
-    position: absolute; /* в правом верхнем углу меню */
-    top: 24px;          /* отступ сверху; iOS override в mobile-ios.css */
-    right: 24px;        /* отступ справа */
-    width: 44px;        /* tap-target 44×44 */
+    position: absolute; /* top-right corner of menu */
+    top: 24px;          /* top offset; iOS override in mobile-ios.css */
+    right: 24px;        /* right offset */
+    width: 44px;        /* tap target 44×44 */
     height: 44px;
     display: flex;
     align-items: center;
@@ -163,47 +163,47 @@
     background: transparent;
     border: none;
     color: white;
-    font-size: 24px;    /* размер иконки × */
+    font-size: 24px;    /* × icon size */
     cursor: pointer;
 }
 
-/* --- Stagger-анимация пунктов меню ---------------------------------------- */
+/* --- Stagger animation for menu items -------------------------------------- */
 
 .mobile-menu li {
-    opacity: 0;                        /* скрыты до открытия */
-    transform: translateY(-20px);      /* смещены вверх */
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* плавное появление */
+    opacity: 0;                        /* hidden before open */
+    transform: translateY(-20px);      /* shifted upward */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* smooth appear */
 }
 
 .mobile-menu.menu-open li {
-    opacity: 1;               /* видимы при открытом меню */
-    transform: translateY(0); /* на месте */
+    opacity: 1;               /* visible when menu is open */
+    transform: translateY(0); /* in place */
 }
 
-.mobile-menu.menu-open li:nth-child(1) { transition-delay: 0.2s;  } /* задержка 1-го пункта */
-.mobile-menu.menu-open li:nth-child(2) { transition-delay: 0.25s; } /* 2-й пункт */
-.mobile-menu.menu-open li:nth-child(3) { transition-delay: 0.3s;  } /* 3-й пункт */
-.mobile-menu.menu-open li:nth-child(4) { transition-delay: 0.35s; } /* 4-й пункт */
-.mobile-menu.menu-open li:nth-child(5) { transition-delay: 0.4s;  } /* 5-й пункт */
+.mobile-menu.menu-open li:nth-child(1) { transition-delay: 0.2s;  } /* 1st item delay */
+.mobile-menu.menu-open li:nth-child(2) { transition-delay: 0.25s; } /* 2nd item */
+.mobile-menu.menu-open li:nth-child(3) { transition-delay: 0.3s;  } /* 3rd item */
+.mobile-menu.menu-open li:nth-child(4) { transition-delay: 0.35s; } /* 4th item */
+.mobile-menu.menu-open li:nth-child(5) { transition-delay: 0.4s;  } /* 5th item */
 
-/* --- Прочее ---------------------------------------------------------------- */
+/* --- Misc ------------------------------------------------------------------ */
 
 [download="tanhiowyatt_CV.pdf"] {
-    animation: none !important;   /* без анимации на кнопке CV */
-    box-shadow: none !important;  /* без тени */
+    animation: none !important;   /* no animation on CV button */
+    box-shadow: none !important;  /* no shadow */
 }
 
 .mobile-accordion-content a {
-    color: #ffffff !important;                              /* белый текст ссылок в аккордеоне */
-    transition: background-color 0.2s var(--ease);          /* hover-фон */
+    color: #ffffff !important;                              /* white link text in accordion */
+    transition: background-color 0.2s var(--ease);          /* hover background */
 }
 
 .mobile-accordion-content a i {
-    color: #ffffff !important; /* белые иконки */
-    opacity: 1 !important;     /* полная видимость */
+    color: #ffffff !important; /* white icons */
+    opacity: 1 !important;     /* full visibility */
 }
 
 .mobile-accordion-content a:active div,
 .mobile-accordion-content a:hover div {
-    background: rgba(255, 255, 255, 0.1) !important; /* подсветка строки при tap/hover */
+    background: rgba(255, 255, 255, 0.1) !important; /* row highlight on tap/hover */
 }

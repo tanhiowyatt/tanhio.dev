@@ -97,6 +97,116 @@ This is the source code for [tanhio.dev](https://tanhio.dev) and its surrounding
 - **Analytics Consent**: Google Analytics is loaded conditionally only after explicit user consent via the integrated cookie banner.
 - **HTTPS by Default**: Handled effortlessly in production via Caddy.
 
+## 📝 Publishing a Blog Post
+
+Blog posts are written in **MDX** (Markdown with YAML frontmatter) and require changes to **3 files**.
+
+### Step 1 — Create the MDX post file
+
+Create a new file at `sites/main/blog/posts/<slug>.mdx`:
+
+```
+sites/main/blog/posts/my-new-post.mdx
+```
+
+The file must start with a YAML frontmatter block, followed by Markdown content:
+
+```mdx
+---
+title: "Your Post Title"
+date: "2026-01-15"
+excerpt: "A short description shown on the blog index card. Plain text only."
+category: "it"
+---
+
+![Post cover image](../images/my-new-post.png)
+
+## Introduction
+
+Your post content goes here in standard Markdown.
+
+**Bold text**, *italic*, `inline code`, [links](https://example.com)...
+
+## Section Two
+
+- List item one
+- List item two
+```
+
+**Frontmatter fields:**
+
+| Field | Required | Values | Description |
+|---|---|---|---|
+| `title` | ✅ | Any string | Post title shown on card and page |
+| `date` | ✅ | `YYYY-MM-DD` | Publication date, used for sorting |
+| `excerpt` | ✅ | Plain text | Short description for the index card |
+| `category` | ✅ | `it` or `non-it` | Used for category filter on blog index |
+
+---
+
+### Step 2 — Create the HTML page
+
+Copy `sites/main/blog/post-template.html` → `sites/main/blog/<slug>.html`:
+
+```bash
+cp sites/main/blog/post-template.html sites/main/blog/my-new-post.html
+```
+
+Then edit the following values in the new file (all occurrences):
+
+| What to change | Where | Example value |
+|---|---|---|
+| `<title>` | `<head>` | `Your Post Title — tanhiowyatt` |
+| `<link rel="canonical">` | `<head>` | `/blog/my-new-post` |
+| `meta name="title"` | `<head>` | `Your Post Title — tanhiowyatt` |
+| `meta name="description"` | `<head>` | Same as your `excerpt` |
+| All `og:title` / `twitter:title` | `<head>` | Same as title |
+| All `og:description` / `twitter:description` | `<head>` | Same as excerpt |
+| All `og:url` / `twitter:url` | `<head>` | `https://tanhio.dev/blog/my-new-post/` |
+
+The `<body>` content does **not** need to change — `post-renderer.js` automatically loads and renders the MDX file matching the current page URL.
+
+---
+
+### Step 3 — Register the post in `blog.js`
+
+Open `sites/main/assets/components/blog.js` and find the `posts` array (around line 199).  
+Add your new post entry **at the top** of the array (newest first is the convention):
+
+```js
+const posts = [
+  { slug: 'my-new-post', file: '/blog/posts/my-new-post.mdx' }, // ← add here
+  { slug: 'industrial-ussr', file: '/blog/posts/industrial-ussr.mdx' },
+  { slug: 'icann', file: '/blog/posts/icann.mdx' },
+  // ...
+];
+```
+
+The `slug` must match the HTML filename and the MDX filename (without extension).
+
+---
+
+### Step 4 — Add a cover image (optional)
+
+If your post starts with an image (`![alt](../images/my-new-post.png)`), place the image at:
+
+```
+sites/main/blog/images/my-new-post.png
+```
+
+Recommended size: **1200×630 px** (standard OG image ratio).
+
+---
+
+### Summary checklist
+
+```
+[ ] sites/main/blog/posts/my-new-post.mdx     — post content
+[ ] sites/main/blog/my-new-post.html          — post page (copied from post-template.html, meta tags updated)
+[ ] sites/main/assets/components/blog.js      — add entry to posts[] array
+[ ] sites/main/blog/images/my-new-post.png    — cover image (optional)
+```
+
 ## 📄 License
 
 This project is licensed under the MIT License.

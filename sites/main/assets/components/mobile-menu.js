@@ -6,12 +6,23 @@ let mobileMenu = null;
 let closeButton = null;
 let triggers = [];
 
+function hideCookieBanner() {
+  const banner = document.getElementById('cookie-consent-banner');
+  if (banner) banner.classList.add('cookie-hidden');
+}
+
+function restoreCookieBanner() {
+  const banner = document.getElementById('cookie-consent-banner');
+  if (banner) banner.classList.remove('cookie-hidden');
+}
+
 function openMenu() {
   if (!mobileMenu || !burgerButton) return;
   mobileMenu.classList.add('menu-open');
   burgerButton.classList.add('active');
   document.body.style.overflow = 'hidden';
   burgerButton.setAttribute('aria-expanded', 'true');
+  hideCookieBanner();
 }
 
 function closeMenu() {
@@ -20,6 +31,7 @@ function closeMenu() {
   burgerButton.classList.remove('active');
   document.body.style.overflow = '';
   burgerButton.setAttribute('aria-expanded', 'false');
+  restoreCookieBanner();
 }
 
 function handleKeydown(e) {

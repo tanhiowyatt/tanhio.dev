@@ -4,22 +4,22 @@
 }
 
 ::-webkit-scrollbar-track {
-  /* Едва заметная прозрачная подложка */
+  /* Barely visible transparent track */
   background: rgba(255, 255, 255, 0.02);
   border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-  /* Полупрозрачный белый (стеклянный) ползунок */
+  /* Semi-transparent white (glass) thumb */
   background: rgba(255, 255, 255, 0.2);
   border-radius: 6px;
-  /* Темная рамка цвета твоего фона, чтобы ползунок казался "парящим" */
+  /* Dark border matching background color to give a "floating" appearance */
   border: 2px solid #1A1A19;
   transition: background 0.2s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  /* При наведении становится ярче */
+  /* Brighter on hover */
   background: rgba(255, 255, 255, 0.4);
 }
 

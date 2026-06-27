@@ -1,176 +1,176 @@
 /* =============================================================================
-   Мобильная вёрстка — экраны ≤ 768px (телефоны)
+   Mobile layout — screens ≤ 768px (phones)
    ============================================================================= */
 
 @media (max-width: 768px) {
 
-  /* --- Hero-секция --------------------------------------------------------- */
+  /* --- Hero section --------------------------------------------------------- */
 
   .hero-lead {
-    width: 100%; /* текстовый блок на всю ширину экрана */
+    width: 100%; /* text block spans full screen width */
   }
 
   .hero-copy {
-    font-size: clamp(24px, 6vw, 32px) !important; /* адаптивный заголовок: min 24px, max 32px */
-    line-height: 1.2;                               /* плотный межстрочный интервал для заголовка */
-    display: block !important;                      /* гарантируем видимость блока */
-    visibility: visible !important;               /* переопределяем возможный hidden */
-    opacity: 1 !important;                        /* убираем прозрачность от анимаций */
+    font-size: clamp(24px, 6vw, 32px) !important; /* fluid heading: min 24px, max 32px */
+    line-height: 1.2;                               /* tight line-height for the heading */
+    display: block !important;                      /* ensure block is visible */
+    visibility: visible !important;               /* override possible hidden state */
+    opacity: 1 !important;                        /* remove animation-induced transparency */
   }
 
   .hero-copy-box {
-    max-height: none !important;    /* снимаем ограничение высоты текста */
-    overflow: visible !important;   /* показываем весь текст без обрезки */
+    max-height: none !important;    /* remove height cap on text */
+    overflow: visible !important;   /* show all text without clipping */
   }
 
   .hero-greet {
-    font-size: clamp(20px, 5vw, 24px) !important; /* приветствие: min 20px, max 24px */
+    font-size: clamp(20px, 5vw, 24px) !important; /* greeting: min 20px, max 24px */
   }
 
-  /* --- Портрет ------------------------------------------------------------- */
+  /* --- Portrait ------------------------------------------------------------- */
 
   .portrait {
-    width: 100% !important;           /* контейнер портрета на всю ширину */
-    max-width: 300px;                 /* но не шире 300px */
-    height: 300px !important;         /* фиксированная высота квадрата */
-    aspect-ratio: 1;                    /* соотношение сторон 1:1 */
-    margin: 2rem auto !important;       /* центрируем с отступом сверху/снизу */
-    display: block !important;          /* блочный элемент для margin: auto */
-    visibility: visible !important;   /* принудительно видим */
+    width: 100% !important;           /* portrait container spans full width */
+    max-width: 300px;                 /* but no wider than 300px */
+    height: 300px !important;         /* fixed square height */
+    aspect-ratio: 1;                    /* 1:1 aspect ratio */
+    margin: 2rem auto !important;       /* centered with top/bottom margin */
+    display: block !important;          /* block element for margin: auto */
+    visibility: visible !important;   /* force visibility */
   }
 
   .hero-portrait {
-    display: block !important;              /* фото внутри контейнера — block */
-    width: 100% !important;                 /* растягиваем по ширине контейнера */
-    height: 100% !important;                /* растягиваем по высоте контейнера */
-    background-size: cover !important;      /* обрезаем фото по cover */
-    background-position: center !important; /* центрируем фото */
-    background-repeat: no-repeat !important;/* без повторения */
-    visibility: visible !important;         /* принудительно видим */
-    opacity: 1 !important;                  /* без прозрачности */
+    display: block !important;              /* photo inside container — block */
+    width: 100% !important;                 /* stretch to container width */
+    height: 100% !important;                /* stretch to container height */
+    background-size: cover !important;      /* cover crop */
+    background-position: center !important; /* center photo */
+    background-repeat: no-repeat !important;/* no tiling */
+    visibility: visible !important;         /* force visibility */
+    opacity: 1 !important;                  /* no transparency */
   }
 
-  /* --- Сетка hero ---------------------------------------------------------- */
+  /* --- Hero grid ------------------------------------------------------------ */
 
   .justify-self-end {
-    display: block !important;          /* портрет в одну колонку под текстом */
-    width: 100% !important;             /* на всю ширину */
-    justify-self: center !important;    /* центрируем в grid */
+    display: block !important;          /* portrait in single column below text */
+    width: 100% !important;             /* full width */
+    justify-self: center !important;    /* centered in grid */
   }
 
-  /* --- Типографика и overflow ---------------------------------------------- */
+  /* --- Typography and overflow ---------------------------------------------- */
 
   * {
-    overflow-wrap: break-word; /* перенос длинных слов/URL */
-    word-wrap: break-word;     /* fallback для старых браузеров */
+    overflow-wrap: break-word; /* wrap long words/URLs */
+    word-wrap: break-word;     /* fallback for older browsers */
   }
 
   body {
-    overflow-x: clip;   /* запрет горизонтального скролла */
-    max-width: 100vw;     /* body не шире viewport */
+    overflow-x: clip;   /* prevent horizontal scroll */
+    max-width: 100vw;     /* body no wider than viewport */
   }
 
   img {
-    max-width: 100%;  /* картинки не вылезают за экран */
-    height: auto;     /* сохраняем пропорции */
+    max-width: 100%;  /* images don't overflow screen */
+    height: auto;     /* preserve aspect ratio */
   }
 
   .text-\[12px\] {
-    font-size: 11px !important; /* мелкий текст чуть меньше на телефоне */
-    line-height: 1.5;           /* комфортный межстрочный интервал */
+    font-size: 11px !important; /* small text slightly smaller on phone */
+    line-height: 1.5;           /* comfortable line spacing */
   }
 
-  /* --- Секция Experience --------------------------------------------------- */
+  /* --- Experience section --------------------------------------------------- */
 
   #experience .static-tile {
-    padding: 1.5rem !important; /* компактнее внутренние отступы карточки */
+    padding: 1.5rem !important; /* more compact card padding */
   }
 
   #experience .grid {
-    grid-template-columns: 1fr !important; /* одна колонка вместо нескольких */
-    gap: 1rem !important;                  /* уменьшенный gap между элементами */
+    grid-template-columns: 1fr !important; /* single column instead of multiple */
+    gap: 1rem !important;                  /* reduced gap between items */
   }
 
   #experience li {
-    padding-top: 1.5rem !important;    /* вертикальные отступы пунктов списка */
-    padding-bottom: 1.5rem !important; /* симметрично снизу */
+    padding-top: 1.5rem !important;    /* vertical padding for list items */
+    padding-bottom: 1.5rem !important; /* symmetrical bottom padding */
   }
 
   #experience h2 {
-    font-size: 1.5rem !important; /* заголовок секции меньше на мобилке */
-    line-height: 1.3;             /* плотнее межстрочный */
+    font-size: 1.5rem !important; /* section heading smaller on mobile */
+    line-height: 1.3;             /* tighter line spacing */
   }
 
   #experience .text-slate-300\/90 {
-    font-size: 13px !important; /* основной текст experience */
-    line-height: 1.6;           /* читаемый интервал */
+    font-size: 13px !important; /* experience body text */
+    line-height: 1.6;           /* readable spacing */
   }
 
-  /* --- Навбар -------------------------------------------------------------- */
+  /* --- Navbar --------------------------------------------------------------- */
 
   .nav-pill {
-    max-width: 100%;    /* pill не выходит за края экрана */
-    overflow: visible;  /* dropdown-меню не обрезается overflow:hidden */
+    max-width: 100%;    /* pill doesn't overflow screen edges */
+    overflow: visible;  /* dropdown menus are not clipped */
   }
 }
 
 /* =============================================================================
-   Планшеты — 769px–1024px
+   Tablets — 769px–1024px
    ============================================================================= */
 
 @media (min-width: 769px) and (max-width: 1024px) {
   #links .grid {
-    grid-template-columns: repeat(2, 1fr) !important; /* две колонки карточек */
+    grid-template-columns: repeat(2, 1fr) !important; /* two card columns */
   }
 
   .link-card.map-card {
-    grid-column: 1 / -1 !important; /* карта на всю ширину сетки */
+    grid-column: 1 / -1 !important; /* map spans full grid width */
   }
 }
 
 /* =============================================================================
-   Широкие экраны — ≥ 1025px
+   Wide screens — ≥ 1025px
    ============================================================================= */
 
 @media (min-width: 1025px) {
   #links .grid {
-    gap: 2rem; /* больше воздуха между карточками на desktop */
+    gap: 2rem; /* more breathing room between cards on desktop */
   }
 
   #links .link-card.square {
-    min-width: 0;   /* grid-item может сжиматься */
-    width: 100%;    /* заполняет ячейку сетки */
+    min-width: 0;   /* grid item can shrink */
+    width: 100%;    /* fills grid cell */
   }
 
   #links {
-    padding-top: calc(var(--section-py) + 60px);    /* доп. отступ сверху */
-    padding-bottom: calc(var(--section-py) + 5rem); /* доп. отступ снизу */
-    margin-bottom: 2rem;                            /* зазор перед footer */
+    padding-top: calc(var(--section-py) + 60px);    /* extra top spacing */
+    padding-bottom: calc(var(--section-py) + 5rem); /* extra bottom spacing */
+    margin-bottom: 2rem;                            /* gap before footer */
   }
 }
 
 /* =============================================================================
-   Доступность — уменьшенная анимация
+   Accessibility — reduced motion
    ============================================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   html {
-    scroll-behavior: auto; /* мгновенный скролл без smooth */
+    scroll-behavior: auto; /* instant scroll, no smooth */
   }
 
   a, button, header, footer, .link-card {
-    transition: none !important; /* отключаем все CSS-переходы */
+    transition: none !important; /* disable all CSS transitions */
   }
 }
 
 /* =============================================================================
-   Desktop — запрет горизонтального скролла
+   Desktop — prevent horizontal scroll
    ============================================================================= */
 
 @media (min-width: 769px) {
   html, body {
-    width: 100%;         /* фиксируем ширину */
-    max-width: 100%;     /* не шире viewport */
-    overflow-x: hidden;  /* скрываем горизонтальный overflow */
+    width: 100%;         /* lock width */
+    max-width: 100%;     /* no wider than viewport */
+    overflow-x: hidden;  /* hide horizontal overflow */
   }
 }

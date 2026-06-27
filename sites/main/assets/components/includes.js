@@ -42,11 +42,11 @@
   }
 
   function ensureThemeColor() {
-    // Fallback: <meta name="theme-color"> задаёт цвет Dynamic Island / Control Center в iOS Safari
+    // Fallback: <meta name="theme-color"> sets the Dynamic Island / Control Center color in iOS Safari
     if (document.querySelector('meta[name="theme-color"]')) return;
     const meta = document.createElement('meta');
     meta.name = 'theme-color';
-    meta.content = '#111110'; // совпадает с --site-bg-color
+    meta.content = '#111110'; // matches --site-bg-color
     document.head.appendChild(meta);
   }
 
@@ -84,7 +84,7 @@
     }
 
     const consentHTML = `
-      <div id="cookie-consent-banner" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] md:w-full md:max-w-xl z-50 p-6 md:p-8 rounded-3xl bg-[#0B0B0F]/70 border border-white/10 backdrop-blur-xl shadow-2xl flex flex-col gap-5 transition-all duration-500 transform translate-y-12 opacity-0 select-none">
+      <div id="cookie-consent-banner" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] md:w-full md:max-w-xl z-50 p-6 md:p-8 rounded-3xl border border-white/10 shadow-2xl flex flex-col gap-5 transition-all duration-500 transform translate-y-12 opacity-0 select-none" style="background-color: #090908;">
         <div class="flex items-center gap-2">
           <span class="text-xl">🍪</span>
           <h4 class="text-lg font-bold text-white tracking-tight">Cookie Consent</h4>

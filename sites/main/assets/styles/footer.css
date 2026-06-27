@@ -38,6 +38,10 @@
     transform: translateX(4px);
 }
 
+.footer-brand-name {
+    font-weight: 700 !important;
+}
+
 #footer .brand-avatar {
     background-image: var(--brand-image);
     background-size: cover;
