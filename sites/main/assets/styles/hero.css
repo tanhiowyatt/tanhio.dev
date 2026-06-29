@@ -57,6 +57,10 @@
   overflow: visible;
 }
 
+.hero-disclaimer {
+  text-align: justify;
+}
+
 
 @media (max-width: 768px) {
   .portrait {

@@ -16,6 +16,8 @@
     display: block !important;                      /* ensure block is visible */
     visibility: visible !important;               /* override possible hidden state */
     opacity: 1 !important;                        /* remove animation-induced transparency */
+    text-align: justify !important;
+    text-wrap: wrap !important;
   }
 
   .hero-copy-box {
@@ -78,6 +80,10 @@
   .text-\[12px\] {
     font-size: 11px !important; /* small text slightly smaller on phone */
     line-height: 1.5;           /* comfortable line spacing */
+  }
+
+  .hero-disclaimer {
+    text-align: justify !important;
   }
 
   /* --- Experience section --------------------------------------------------- */

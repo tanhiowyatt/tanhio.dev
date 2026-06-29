@@ -188,6 +188,10 @@ async function loadBlogPost() {
 
     updateMetadata(frontmatter);
 
+    if (postContainer) {
+      postContainer.setAttribute('lang', frontmatter.lang || 'ru');
+    }
+
     if (headerContainer && frontmatter.title) {
       const dateStr = frontmatter.date 
         ? new Date(frontmatter.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
