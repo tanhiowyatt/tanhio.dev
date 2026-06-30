@@ -26,7 +26,8 @@ const csrfProtection = new csrf();
 // 1. Main Site (tanhio.dev)
 const mainApp = express();
 mainApp.use(express.static(path.join(__dirname, './sites/main'), {
-  extensions: ['html']
+  extensions: ['html'],
+  redirect: false
 }));
 // Redirect index requests to root
 mainApp.get('/index', (req, res) => res.redirect(301, '/'));
@@ -62,7 +63,8 @@ blogApp.use((req, res, next) => {
   }
 });
 blogApp.use(express.static(blogPath, {
-  extensions: ['html', 'mdx']
+  extensions: ['html', 'mdx'],
+  redirect: false
 }));
 
 blogApp.get('/index', (req, res) => res.redirect(301, '/blog'));
@@ -131,7 +133,6 @@ app.use((req, res, next) => {
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
   next();
