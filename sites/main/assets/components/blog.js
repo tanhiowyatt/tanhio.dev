@@ -197,11 +197,11 @@ async function loadBlogPosts() {
   postsContainer.innerHTML = '';
 
   const posts = [
-    { slug: 'industrial-ussr', file: '/blog/posts/industrial-ussr.mdx' },
-    { slug: 'icann', file: '/blog/posts/icann.mdx' },
-    { slug: 'dogs-and-govs', file: '/blog/posts/dogs-and-govs.mdx' },
-    { slug: 'thum', file: '/blog/posts/thum.mdx' },
-    { slug: 'runet-blocks', file: '/blog/posts/runet-blocks.mdx' }
+    { slug: '/blog/industrial-ussr', file: '/blog/posts/industrial-ussr.mdx' },
+    { slug: '/blog/icann', file: '/blog/posts/icann.mdx' },
+    { slug: '/blog/dogs-and-govs', file: '/blog/posts/dogs-and-govs.mdx' },
+    { slug: '/blog/thum', file: '/blog/posts/thum.mdx' },
+    { slug: '/blog/runet-blocks', file: '/blog/posts/runet-blocks.mdx' }
   ];
 
   try {
