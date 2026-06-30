@@ -51,11 +51,21 @@ blogApp.use((req, res, next) => {
   }
   next();
 });
+// Redirect trailing slashes for blog routes
+blogApp.use((req, res, next) => {
+  if (req.path.length > 1 && req.path.endsWith('/')) {
+    const query = req.url.slice(req.path.length);
+    const cleanPath = req.path.slice(0, -1);
+    res.redirect(301, '/blog' + cleanPath + query);
+  } else {
+    next();
+  }
+});
 blogApp.use(express.static(blogPath, {
   extensions: ['html', 'mdx']
 }));
 
-blogApp.get('/index', (req, res) => res.redirect(301, '/blog/'));
+blogApp.get('/index', (req, res) => res.redirect(301, '/blog'));
 // Blog fallback: serve index.html for SPA-like behavior, but ONLY for non-file paths
 blogApp.get('*', (req, res) => {
   // If it looks like a file (has an extension) and isn't a directory-like path, return 404 instead of index.html
@@ -74,6 +84,17 @@ blogApp.get('*', (req, res) => {
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Redirect trailing slashes globally (except for root /)
+app.use((req, res, next) => {
+  if (req.path.length > 1 && req.path.endsWith('/')) {
+    const query = req.url.slice(req.path.length);
+    const cleanPath = req.path.slice(0, -1);
+    res.redirect(301, cleanPath + query);
+  } else {
+    next();
+  }
+});
 
 // Shared static assets for ALL subdomains (keeping these for main site and absolute links)
 app.use('/assets', express.static(path.join(__dirname, './sites/main/assets')));
