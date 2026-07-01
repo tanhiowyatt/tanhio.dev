@@ -35,6 +35,11 @@ mainApp.get('/index', (req, res) => res.redirect(301, '/'));
 // Handle API 404s
 mainApp.use('/api', (req, res) => res.status(404).json({ error: 'API endpoint not found' }));
 
+// Catch-all route to serve the custom 404 page
+mainApp.get('*', (req, res) => {
+  res.status(404).sendFile(path.join(__dirname, './sites/main/404.html'));
+});
+
 // 2. Blog (tanhio.dev/blog)
 const blogApp = express();
 const blogPath = path.join(__dirname, './sites/main/blog');
@@ -67,18 +72,18 @@ blogApp.use(express.static(blogPath, {
   redirect: false
 }));
 
-blogApp.get('/index', (req, res) => res.redirect(301, '/blog'));
-// Blog fallback: serve index.html for SPA-like behavior, but ONLY for non-file paths
-blogApp.get('*', (req, res) => {
-  // If it looks like a file (has an extension) and isn't a directory-like path, return 404 instead of index.html
-  if (req.path.includes('.') && !req.path.endsWith('.html')) {
-    return res.status(404).send('404 - Asset Not Found');
-  }
-
-  res.sendFile(path.join(blogPath, 'index.html'), (err) => {
-    if (err) res.status(404).send('Blog 404 - Not Found');
-  });
+blogApp.get('/', (req, res) => {
+  res.sendFile(path.join(blogPath, 'index.html'));
 });
+
+blogApp.get('/index', (req, res) => res.redirect(301, '/blog'));
+
+// Blog fallback: serve the custom 404 page if a blog route is not found
+blogApp.get('*', (req, res) => {
+  res.status(404).sendFile(path.join(__dirname, './sites/main/404.html'));
+});
+
+
 
 // --- MAIN SERVER CONFIG ---
 
