@@ -2,7 +2,7 @@
  * Unit Tests for Post Renderer
  */
 
-const PostRenderer = require('../../sites/main/assets/components/post-renderer.js');
+const PostRenderer = require('../../sites/shared/assets/components/post-renderer.js');
 
 describe('PostRenderer', () => {
   beforeEach(() => {

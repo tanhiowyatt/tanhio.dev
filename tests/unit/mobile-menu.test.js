@@ -2,7 +2,7 @@
  * Unit Tests for Mobile Menu
  */
 
-const MobileMenu = require('../../sites/main/assets/components/mobile-menu.js');
+const MobileMenu = require('../../sites/shared/assets/components/mobile-menu.js');
 
 describe('MobileMenu', () => {
   beforeEach(() => {

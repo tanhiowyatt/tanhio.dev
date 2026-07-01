@@ -4,7 +4,7 @@
 
 globalThis.__TEST__ = true;
 
-const Blog = require('../../sites/main/assets/components/blog.js');
+const Blog = require('../../sites/shared/assets/components/blog.js');
 
 describe('Blog', () => {
   beforeEach(() => {

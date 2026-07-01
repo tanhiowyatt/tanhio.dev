@@ -4,7 +4,7 @@
 
 globalThis.__TEST__ = true;
 
-const SanitizeHTML = require('../../sites/main/assets/utils/sanitize-html.js');
+const SanitizeHTML = require('../../sites/shared/assets/utils/sanitize-html.js');
 
 describe('SanitizeHTML', () => {
   beforeEach(() => {

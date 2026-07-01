@@ -2,7 +2,7 @@
  * Unit Tests for Includes Component
  */
 
-const Includes = require('../../sites/main/assets/components/includes.js');
+const Includes = require('../../sites/shared/assets/components/includes.js');
 
 describe('Includes', () => {
   beforeEach(() => {

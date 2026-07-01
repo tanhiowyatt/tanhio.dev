@@ -3,7 +3,7 @@ const path = require('node:path');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const csrf = require('csrf');
-const vhost = require('vhost');
+
 
 const app = express();
 const PORT = process.env.PORT || 5173;
@@ -21,67 +21,55 @@ if (!process.env.VERCEL) {
 // Initialize CSRF protection
 const csrfProtection = new csrf();
 
-// --- SUB-APPLICATIONS ---
+// --- DYNAMIC SUB-APPLICATIONS LOADER ---
+const fs = require('node:fs');
+const sitesDir = path.join(__dirname, 'sites');
+const sites = {};
 
-// 1. Main Site (tanhio.dev)
-const mainApp = express();
-mainApp.use(express.static(path.join(__dirname, './sites/main'), {
-  extensions: ['html'],
-  redirect: false
-}));
-// Redirect index requests to root
-mainApp.get('/index', (req, res) => res.redirect(301, '/'));
-
-// Handle API 404s
-mainApp.use('/api', (req, res) => res.status(404).json({ error: 'API endpoint not found' }));
-
-// Catch-all route to serve the custom 404 page
-mainApp.get('*', (req, res) => {
-  res.status(404).sendFile(path.join(__dirname, './sites/main/404.html'));
-});
-
-// 2. Blog (tanhio.dev/blog)
-const blogApp = express();
-const blogPath = path.join(__dirname, './sites/main/blog');
-
-// Serve shared assets even when requested relative to /blog
-blogApp.use('/assets', express.static(path.join(__dirname, './sites/main/assets')));
-blogApp.use('/partials', express.static(path.join(__dirname, './sites/main/partials')));
-blogApp.use('/pics', express.static(path.join(__dirname, './sites/main/pics')));
-blogApp.use('/files', express.static(path.join(__dirname, './sites/main/files')));
-
-// Serve blog-specific static files
-blogApp.use((req, res, next) => {
-  if (req.path.endsWith('.mdx')) {
-    res.setHeader('Content-Type', 'text/markdown; charset=UTF-8');
+// Scan the sites directory and load sites dynamically
+fs.readdirSync(sitesDir).forEach(dir => {
+  const dirPath = path.join(sitesDir, dir);
+  if (fs.statSync(dirPath).isDirectory()) {
+    if (dir === 'shared') return; // Skip shared resources folder
+    
+    // Check if site has a custom router/app
+    const routerPath = path.join(dirPath, 'index.js');
+    if (fs.existsSync(routerPath)) {
+      sites[dir] = require(routerPath);
+    } else {
+      // Default static router for static sites
+      const staticRouter = express.Router();
+      
+      // Serve static assets for the site
+      staticRouter.use(express.static(dirPath, {
+        extensions: ['html'],
+        redirect: false
+      }));
+      
+      // Serve root index.html
+      staticRouter.get('/', (req, res) => {
+        res.sendFile(path.join(dirPath, 'index.html'));
+      });
+      
+      // Redirect index requests to root
+      staticRouter.get('/index', (req, res) => res.redirect(301, '/'));
+      
+      // Special handling for api 404s on the main site
+      if (dir === 'main') {
+        staticRouter.use('/api', (req, res) => res.status(404).json({ error: 'API endpoint not found' }));
+      }
+      
+      // Fallback 404
+      staticRouter.get('*', (req, res) => {
+        res.status(404).sendFile(path.join(sitesDir, 'main/404.html'));
+      });
+      
+      sites[dir] = staticRouter;
+    }
   }
-  next();
-});
-// Redirect trailing slashes for blog routes
-blogApp.use((req, res, next) => {
-  if (req.path.length > 1 && req.path.endsWith('/')) {
-    const query = req.url.slice(req.path.length);
-    const cleanPath = req.path.slice(0, -1);
-    res.redirect(301, '/blog' + cleanPath + query);
-  } else {
-    next();
-  }
-});
-blogApp.use(express.static(blogPath, {
-  extensions: ['html', 'mdx'],
-  redirect: false
-}));
-
-blogApp.get('/', (req, res) => {
-  res.sendFile(path.join(blogPath, 'index.html'));
 });
 
-blogApp.get('/index', (req, res) => res.redirect(301, '/blog'));
-
-// Blog fallback: serve the custom 404 page if a blog route is not found
-blogApp.get('*', (req, res) => {
-  res.status(404).sendFile(path.join(__dirname, './sites/main/404.html'));
-});
+const mainApp = sites['main'];
 
 
 
@@ -103,15 +91,16 @@ app.use((req, res, next) => {
   }
 });
 
-// Shared static assets for ALL subdomains (keeping these for main site and absolute links)
-app.use('/assets', express.static(path.join(__dirname, './sites/main/assets')));
-app.use('/partials', express.static(path.join(__dirname, './sites/main/partials')));
-app.use('/pics', express.static(path.join(__dirname, './sites/main/pics')));
-app.use('/files', express.static(path.join(__dirname, './sites/main/files')));
+// Shared static assets for ALL subdomains & sites
+app.use('/assets', express.static(path.join(__dirname, './sites/shared/assets')));
+app.use('/partials', express.static(path.join(__dirname, './sites/shared/partials')));
+app.use('/pics', express.static(path.join(__dirname, './sites/shared/pics')));
+app.use('/files', express.static(path.join(__dirname, './sites/shared/files')));
 
-// --- MOUNT BLOG SUB-APP ---
-// Explicitly mount at /blog BEFORE reaching vhost routers or main app
-app.use('/blog', blogApp);
+// --- MOUNT SUB-APPS (SUBPATH ROUTING FOR BACKWARD COMPATIBILITY) ---
+if (sites['blog']) {
+  app.use('/blog', sites['blog']);
+}
 
 // Security headers (Helmet)
 app.use(helmet({
@@ -178,17 +167,29 @@ app.get('/api/csrf-token', (req, res) => {
   res.json({ csrfToken: token });
 });
 
-// --- VHOST ROUTING ---
-
-// Production domains
-app.use(vhost('tanhio.dev', mainApp));
-app.use(vhost('www.tanhio.dev', mainApp));
-
-// Local development support
-app.use(vhost('localhost', mainApp));
-
-// Fallback for direct IP access or unmatched hosts
-app.use(mainApp);
+// --- DYNAMIC HOST ROUTING ---
+app.use((req, res, next) => {
+  const host = req.headers.host || '';
+  const cleanHost = host.split(':')[0].toLowerCase();
+  
+  const prodDomain = 'tanhio.dev';
+  
+  // Extract subdomain if matching the domain format
+  let subdomain = null;
+  if (cleanHost.endsWith(`.${prodDomain}`)) {
+    subdomain = cleanHost.slice(0, -(prodDomain.length + 1));
+  } else if (cleanHost.endsWith('.localhost')) {
+    subdomain = cleanHost.slice(0, -('.localhost'.length));
+  }
+  
+  // Route to the corresponding subdomain site if it exists (excluding www and blog)
+  if (subdomain && subdomain !== 'www' && subdomain !== 'blog' && sites[subdomain]) {
+    return sites[subdomain](req, res, next);
+  }
+  
+  // Default fallback (tanhio.dev, www.tanhio.dev, localhost, etc.)
+  return mainApp(req, res, next);
+});
 
 // Export the app for Vercel Serverless Functions
 module.exports = app;

@@ -2,7 +2,7 @@
  * Integration Tests for Links Grid
  */
 
-const LinksGrid = require('../../sites/main/assets/components/links-grid.js');
+const LinksGrid = require('../../sites/shared/assets/components/links-grid.js');
 
 describe('LinksGrid', () => {
   beforeEach(() => {

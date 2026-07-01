@@ -2,7 +2,7 @@
  * Unit Tests for Security Utilities
  */
 
-const SecurityUtils = require('../../sites/main/assets/utils/security.js');
+const SecurityUtils = require('../../sites/shared/assets/utils/security.js');
 
 describe('SecurityUtils', () => {
   describe('sanitizeInput', () => {

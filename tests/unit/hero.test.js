@@ -2,7 +2,7 @@
  * Unit Tests for Hero Component
  */
 
-const Hero = require('../../sites/main/assets/components/hero.js');
+const Hero = require('../../sites/shared/assets/components/hero.js');
 
 describe('Hero', () => {
   beforeEach(() => {

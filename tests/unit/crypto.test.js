@@ -2,7 +2,7 @@
  * Unit Tests for Crypto Component
  */
 
-const Crypto = require('../../sites/main/assets/components/crypto.js');
+const Crypto = require('../../sites/shared/assets/components/crypto.js');
 
 describe('Crypto', () => {
   beforeEach(() => {

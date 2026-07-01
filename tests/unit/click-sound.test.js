@@ -4,7 +4,7 @@
 
 globalThis.__TEST__ = true;
 
-const ClickSound = require('../../sites/main/assets/utils/click-sound.js');
+const ClickSound = require('../../sites/shared/assets/utils/click-sound.js');
 
 describe('ClickSound', () => {
   let locationSpy;

@@ -3,16 +3,16 @@
  * Aggregates all components to ensure coverage is tracked correctly
  */
 
-const SecurityUtils = require('../../sites/main/assets/utils/security.js');
-const SanitizeHTML = require('../../sites/main/assets/utils/sanitize-html.js');
-const ClickSound = require('../../sites/main/assets/utils/click-sound.js');
-const CryptoUtils = require('../../sites/main/assets/components/crypto.js');
-const Blog = require('../../sites/main/assets/components/blog.js');
-const Hero = require('../../sites/main/assets/components/hero.js');
-const Includes = require('../../sites/main/assets/components/includes.js');
-const LinksGrid = require('../../sites/main/assets/components/links-grid.js');
-const MobileMenu = require('../../sites/main/assets/components/mobile-menu.js');
-const PostRenderer = require('../../sites/main/assets/components/post-renderer.js');
+const SecurityUtils = require('../../sites/shared/assets/utils/security.js');
+const SanitizeHTML = require('../../sites/shared/assets/utils/sanitize-html.js');
+const ClickSound = require('../../sites/shared/assets/utils/click-sound.js');
+const CryptoUtils = require('../../sites/shared/assets/components/crypto.js');
+const Blog = require('../../sites/shared/assets/components/blog.js');
+const Hero = require('../../sites/shared/assets/components/hero.js');
+const Includes = require('../../sites/shared/assets/components/includes.js');
+const LinksGrid = require('../../sites/shared/assets/components/links-grid.js');
+const MobileMenu = require('../../sites/shared/assets/components/mobile-menu.js');
+const PostRenderer = require('../../sites/shared/assets/components/post-renderer.js');
 
 describe('Master Suite', () => {
   beforeAll(() => {

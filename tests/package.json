@@ -27,7 +27,7 @@
     "rootDir": "../",
     "roots": [
       "<rootDir>/tests",
-      "<rootDir>/sites/main/assets"
+      "<rootDir>/sites/shared/assets"
     ],
     "testMatch": [
       "**/*.test.js"
@@ -41,10 +41,10 @@
       "/e2e/"
     ],
     "collectCoverageFrom": [
-      "<rootDir>/sites/main/assets/**/*.js",
-      "!<rootDir>/sites/main/assets/**/*.test.js",
-      "!<rootDir>/sites/main/assets/vendor/**",
-      "!<rootDir>/sites/main/assets/components/map.js"
+      "<rootDir>/sites/shared/assets/**/*.js",
+      "!<rootDir>/sites/shared/assets/**/*.test.js",
+      "!<rootDir>/sites/shared/assets/vendor/**",
+      "!<rootDir>/sites/shared/assets/components/map.js"
     ],
     "coverageThreshold": {
       "global": {
@@ -55,7 +55,7 @@
       }
     },
     "moduleNameMapper": {
-      "^assets/(.*)$": "<rootDir>/sites/main/assets/$1"
+      "^assets/(.*)$": "<rootDir>/sites/shared/assets/$1"
     }
   }
 }
