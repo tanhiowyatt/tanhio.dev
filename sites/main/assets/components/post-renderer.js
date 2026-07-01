@@ -98,7 +98,7 @@ function markdownToHTML(markdown) {
 }
 
 // Update page metadata
-function updateMetadata(frontmatter) {
+function updateMetadata(frontmatter, content) {
   if (!frontmatter) return;
 
   const siteTitle = 'tanhiowyatt';
@@ -115,10 +115,27 @@ function updateMetadata(frontmatter) {
     updateMetaTag('name', 'twitter:description', frontmatter.description);
   }
 
+  let imageUrl = null;
   if (frontmatter.image) {
-    const imageUrl = frontmatter.image.startsWith('http') 
+    imageUrl = frontmatter.image.startsWith('http') 
       ? frontmatter.image 
       : `https://tanhio.dev/blog/images/${frontmatter.image}`;
+  } else if (content) {
+    // Extract first image from content
+    const imageRegex = /!\[.*?\]\((.*?)\)/;
+    const imageMatch = content.match(imageRegex);
+    if (imageMatch) {
+      const src = imageMatch[1];
+      if (src.startsWith('http')) {
+        imageUrl = src;
+      } else {
+        const cleanSrc = src.replace(/^(\.\.\/|\.\/)+images\//, '').replace(/^(\.\.\/|\.\/)+/, '');
+        imageUrl = `https://tanhio.dev/blog/images/${cleanSrc}`;
+      }
+    }
+  }
+
+  if (imageUrl) {
     updateMetaTag('property', 'og:image', imageUrl);
     updateMetaTag('name', 'twitter:image', imageUrl);
   }
@@ -186,7 +203,7 @@ async function loadBlogPost() {
     const text = await response.text();
     const { frontmatter, content } = parseFrontmatter(text);
 
-    updateMetadata(frontmatter);
+    updateMetadata(frontmatter, content);
 
     if (postContainer) {
       postContainer.setAttribute('lang', frontmatter.lang || 'ru');
