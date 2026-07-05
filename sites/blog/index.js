@@ -98,8 +98,8 @@ function generateRSSFeed(lang) {
   const targetLang = ['en', 'ru', 'pl'].includes(lang) ? lang : 'en';
   const postsDir = path.join(blogPath, targetLang, 'posts');
   const BASE = 'https://tanhio.dev';
-  const LOGO = `${BASE}/pics/favicon-32.png`;
-  const LOGO_HIGH_RES = `${BASE}/pics/apple-touch-icon.png`;
+  const LOGO = `${BASE}/pics/bullseye.png`;
+  const LOGO_HIGH_RES = `${BASE}/pics/bullseye.png`;
   let items = [];
 
   try {
@@ -195,12 +195,11 @@ function generateRSSFeed(lang) {
   <language>${lang === 'pl' ? 'pl' : lang === 'ru' ? 'ru' : 'en'}</language>
   <atom:link href="${feedUrl}" rel="self" type="application/rss+xml" />
   <webfeeds:icon>${LOGO_HIGH_RES}</webfeeds:icon>
+  <webfeeds:logo>${LOGO_HIGH_RES}</webfeeds:logo>
   <image>
-    <url>${LOGO}</url>
+    <url>${LOGO_HIGH_RES}</url>
     <title>${escapeXML(feedTitle)}</title>
     <link>${BASE}/blog</link>
-    <width>32</width>
-    <height>32</height>
   </image>
   ${xmlItems}
 </channel>
