@@ -95,13 +95,6 @@ header {
 }
 
 
-
-.btn-email,
-.btn-email * {
-  text-decoration: none !important;
-}
-
-
 .soc svg,
 .soc i {
   display: block;
@@ -135,7 +128,8 @@ header {
 }
 
 #cookie-consent-banner {
-  background-color: #090908 !important; /* solid background = header color, no transparency */
+  background-color: #090908 !important;
+  /* solid background = header color, no transparency */
   transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 

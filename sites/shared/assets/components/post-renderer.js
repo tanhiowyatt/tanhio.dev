@@ -67,7 +67,11 @@ function markdownToHTML(markdown) {
     let finalSrc = src;
     if (!src.startsWith('http') && !src.startsWith('/')) {
       const cleanSrc = src.replace(/^(\.\.\/|\.\/)+images\//, '').replace(/^(\.\.\/|\.\/)+/, '');
-      finalSrc = `/blog/images/${cleanSrc}`;
+      const lang = getBlogLanguage();
+      const slug = getPostSlug();
+      const isSubpath = typeof globalThis !== 'undefined' && globalThis.location && globalThis.location.pathname.startsWith('/blog');
+      const base = isSubpath ? '/blog' : '';
+      finalSrc = `${base}/${lang}/posts/${slug}/${cleanSrc}`.replace(/\/+/g, '/');
     }
     return `<img src="${finalSrc}" alt="${alt}" class="blog-post-image">`;
   });
@@ -116,10 +120,12 @@ function updateMetadata(frontmatter, content) {
   }
 
   let imageUrl = null;
+  const lang = getBlogLanguage();
+  const slug = getPostSlug();
   if (frontmatter.image) {
     imageUrl = frontmatter.image.startsWith('http') 
       ? frontmatter.image 
-      : `https://tanhio.dev/blog/images/${frontmatter.image}`;
+      : `https://tanhio.dev/blog/${lang}/posts/${slug}/${frontmatter.image}`;
   } else if (content) {
     // Extract first image from content
     const imageRegex = /!\[.*?\]\((.*?)\)/;
@@ -129,8 +135,8 @@ function updateMetadata(frontmatter, content) {
       if (src.startsWith('http')) {
         imageUrl = src;
       } else {
-        const cleanSrc = src.replace(/^(\.\.\/|\.\/)+images\//, '').replace(/^(\.\.\/|\.\/)+/, '');
-        imageUrl = `https://tanhio.dev/blog/images/${cleanSrc}`;
+        const cleanSrc = src.replace(/^(\.\.\/|\.\/)+/, '');
+        imageUrl = `https://tanhio.dev/blog/${lang}/posts/${slug}/${cleanSrc}`;
       }
     }
   }
@@ -151,23 +157,215 @@ function updateMetaTag(attr, key, content) {
   el.setAttribute('content', content || '');
 }
 
+const postTranslations = {
+  en: {
+    backToBlog: "Back to Blog",
+    errorLoading: "Error loading post.",
+    postNotFound: "Post not found."
+  },
+  pl: {
+    backToBlog: "Powrót do bloga",
+    errorLoading: "Błąd podczas ładowania wpisu.",
+    postNotFound: "Nie znaleziono wpisu."
+  },
+  ru: {
+    backToBlog: "Назад в блог",
+    errorLoading: "Ошибка при загрузке поста.",
+    postNotFound: "Пост не найден."
+  }
+};
+
+function getBlogLanguage() {
+  if (typeof globalThis !== 'undefined' && globalThis.location) {
+    const path = globalThis.location.pathname || '';
+    if (path.includes('/ru/') || path.endsWith('/ru')) return 'ru';
+    if (path.includes('/pl/') || path.endsWith('/pl')) return 'pl';
+  }
+
+  if (typeof document !== 'undefined' && document.documentElement && document.documentElement.lang) {
+    const htmlLang = document.documentElement.lang.split('-')[0].toLowerCase();
+    if (['en', 'pl', 'ru'].includes(htmlLang)) {
+      return htmlLang;
+    }
+  }
+
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem('blog-lang');
+      if (saved && ['en', 'pl', 'ru'].includes(saved)) {
+        return saved;
+      }
+    }
+  } catch (e) {
+    console.warn('localStorage is not available:', e);
+  }
+
+  if (typeof navigator !== 'undefined' && navigator.language) {
+    const primary = navigator.language.split('-')[0].toLowerCase();
+    if (['en', 'pl', 'ru'].includes(primary)) {
+      return primary;
+    }
+  }
+
+  return 'en';
+}
+
+function setBlogLanguage(lang) {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('blog-lang', lang);
+    }
+  } catch (e) {
+    console.warn('Failed to save to localStorage:', e);
+  }
+}
+
+function navigateToLanguage(targetLang) {
+  if (typeof globalThis === 'undefined' || !globalThis.location) return;
+  
+  const currentLang = getBlogLanguage();
+  if (targetLang === currentLang) return;
+  
+  setBlogLanguage(targetLang);
+  
+  const path = globalThis.location.pathname || '';
+  const isSubpath = path.startsWith('/blog');
+  const base = isSubpath ? '/blog' : '';
+  
+  let cleanPath = path;
+  if (isSubpath) {
+    cleanPath = path.substring('/blog'.length);
+  }
+  
+  if (cleanPath.startsWith('/ru/')) {
+    cleanPath = cleanPath.substring('/ru'.length);
+  } else if (cleanPath === '/ru') {
+    cleanPath = '/';
+  } else if (cleanPath.startsWith('/pl/')) {
+    cleanPath = cleanPath.substring('/pl'.length);
+  } else if (cleanPath === '/pl') {
+    cleanPath = '/';
+  } else if (cleanPath.startsWith('/en/')) {
+    cleanPath = cleanPath.substring('/en'.length);
+  } else if (cleanPath === '/en') {
+    cleanPath = '/';
+  }
+  
+  let newPath = '';
+  if (targetLang === 'ru') {
+    newPath = base + '/ru' + cleanPath;
+  } else if (targetLang === 'pl') {
+    newPath = base + '/pl' + cleanPath;
+  } else if (targetLang === 'en') {
+    newPath = base + '/en' + cleanPath;
+  } else {
+    newPath = base + cleanPath;
+  }
+  
+  newPath = newPath.replace(/\/+/g, '/');
+  if (newPath === '') newPath = '/';
+  
+  globalThis.location.href = newPath + (globalThis.location.search || '');
+}
+
+function syncMobileLanguageSwitcher(currentLang, onLangChange) {
+  const mobileContainer = document.getElementById('mobile-lang-switcher-container');
+  if (!mobileContainer) return;
+
+  mobileContainer.classList.remove('hidden');
+
+  const buttons = mobileContainer.querySelectorAll('.blog-lang-btn');
+  buttons.forEach(btn => {
+    const isBtnActive = btn.dataset.lang === currentLang;
+    if (isBtnActive) {
+      btn.className = 'blog-lang-btn active flex-1 py-4 text-sm font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-white';
+    } else {
+      btn.className = 'blog-lang-btn flex-1 py-4 text-sm font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200';
+    }
+
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const newLang = btn.dataset.lang;
+      if (newLang === currentLang) return;
+      onLangChange(newLang);
+    };
+  });
+}
+
+function renderLanguageSwitcher() {
+  const container = document.getElementById('blog-lang-switcher');
+  
+  const currentLang = getBlogLanguage();
+  const languages = [
+    { code: 'en', label: 'EN' },
+    { code: 'pl', label: 'PL' },
+    { code: 'ru', label: 'RU' }
+  ];
+
+  // Render desktop switcher if container exists
+  if (container) {
+    const html = `
+      <div class="blog-lang-pill p-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md flex relative select-none w-full">
+        ${languages.map(lang => {
+          const isActive = lang.code === currentLang;
+          const btnClass = isActive
+            ? 'blog-lang-btn active flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-white'
+            : 'blog-lang-btn flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200';
+          return `<button class="${btnClass}" data-lang="${lang.code}">${lang.label}</button>`;
+        }).join('')}
+      </div>
+    `;
+
+    container.innerHTML = html;
+
+    container.querySelectorAll('.blog-lang-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const newLang = btn.dataset.lang;
+        navigateToLanguage(newLang);
+      });
+    });
+  }
+
+  // Sync mobile switcher in burger menu
+  syncMobileLanguageSwitcher(currentLang, (newLang) => {
+    navigateToLanguage(newLang);
+  });
+}
+
 function getPostSlug() {
   const urlParams = new URLSearchParams(globalThis.location.search);
   const slugParam = urlParams.get('post');
   if (slugParam) return slugParam;
 
   const path = globalThis.location.pathname;
-  // Handle /blog/slug or /blog/slug.html
-  const match = /\/blog\/([^/.]+)(?:\.html)?$/.exec(path);
-  return match ? match[1] : null;
+  const cleanPath = path.replace(/\.html$/, '');
+  const segments = cleanPath.split('/').filter(Boolean);
+  if (segments.length > 0) {
+    const lastSegment = segments[segments.length - 1];
+    if (segments.includes('blog') && !['blog', 'ru', 'pl'].includes(lastSegment)) {
+      return lastSegment;
+    }
+  }
+  return null;
 }
 
-async function fetchPostContent(slug) {
+async function fetchPostContent(slug, lang) {
+  const isSubpath = typeof globalThis !== 'undefined' && globalThis.location && globalThis.location.pathname.startsWith('/blog');
+  const base = isSubpath ? '/blog' : '';
+
   const paths = [
-    `/blog/posts/${slug}.mdx`,
-    `./posts/${slug}.mdx`,
-    `../posts/${slug}.mdx`
+    `${base}/${lang}/posts/${slug}/${slug}.mdx`.replace(/\/+/g, '/'),
+    `./posts/${slug}/${slug}.mdx`,
+    `../posts/${slug}/${slug}.mdx`
   ];
+
+  if (lang !== 'en') {
+    paths.push(
+      `${base}/en/posts/${slug}/${slug}.mdx`.replace(/\/+/g, '/'),
+      `../en/posts/${slug}/${slug}.mdx`,
+      `../../en/posts/${slug}/${slug}.mdx`
+    );
+  }
 
   for (const path of paths) {
     try {
@@ -191,13 +389,31 @@ async function loadBlogPost() {
   if (!postContainer) return;
 
   const slug = getPostSlug();
+  const lang = getBlogLanguage();
+  const t = postTranslations[lang] || postTranslations.en;
+
+  const backLink = document.getElementById('blog-back-link');
+  if (backLink) {
+    const isSubpath = typeof globalThis !== 'undefined' && globalThis.location && globalThis.location.pathname.startsWith('/blog');
+    const base = isSubpath ? '/blog' : '';
+    let backUrl = base + '/';
+    if (lang === 'ru') backUrl = base + '/ru';
+    else if (lang === 'pl') backUrl = base + '/pl';
+    else if (lang === 'en') backUrl = base + '/en';
+    backLink.setAttribute('href', backUrl.replace(/\/+/g, '/'));
+  }
+
   if (!slug) {
-    displayError(postContainer, 'Post not found.');
+    displayError(postContainer, t.postNotFound);
     return;
   }
 
+
+  // Render language switcher
+  renderLanguageSwitcher();
+
   try {
-    const response = await fetchPostContent(slug);
+    const response = await fetchPostContent(slug, lang);
     if (!response) throw new Error('Not found');
 
     const text = await response.text();
@@ -206,7 +422,7 @@ async function loadBlogPost() {
     updateMetadata(frontmatter, content);
 
     if (postContainer) {
-      postContainer.setAttribute('lang', frontmatter.lang || 'ru');
+      postContainer.setAttribute('lang', frontmatter.lang || lang);
     }
 
     if (headerContainer && frontmatter.title) {
@@ -226,10 +442,39 @@ async function loadBlogPost() {
     } else {
       SanitizeHTML.setSafeHTML(postContainer, htmlContent);
     }
+
+    // Initialize RSS copy buttons on the post page
+    initRSSCopyButtons();
   } catch (error) {
     console.error('Error loading post:', error);
-    displayError(postContainer, 'Error loading post.');
+    displayError(postContainer, t.errorLoading);
   }
+}
+
+function initRSSCopyButtons() {
+  document.querySelectorAll('.rss-copy-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const feedPath = btn.dataset.feed;
+      const absoluteUrl = window.location.origin + feedPath;
+
+      navigator.clipboard.writeText(absoluteUrl).then(() => {
+        const textSpan = btn.querySelector('.rss-btn-text');
+        if (textSpan) {
+          const originalText = textSpan.textContent;
+          textSpan.textContent = 'Copied!';
+          btn.classList.add('active');
+
+          setTimeout(() => {
+            textSpan.textContent = originalText;
+            btn.classList.remove('active');
+          }, 2000);
+        }
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    });
+  });
 }
 
 const PostRenderer = {
@@ -237,7 +482,12 @@ const PostRenderer = {
   markdownToHTML,
   updateMetadata,
   loadBlogPost,
-  getPostSlug
+  getPostSlug,
+  getBlogLanguage,
+  setBlogLanguage,
+  renderLanguageSwitcher,
+  initRSSCopyButtons,
+  postTranslations
 };
 
 if (typeof globalThis !== 'undefined') globalThis.PostRenderer = PostRenderer;
@@ -250,4 +500,10 @@ if (typeof document !== 'undefined' && !globalThis.__TEST__) {
   } else {
     loadBlogPost();
   }
+
+  document.addEventListener('partialLoaded', (e) => {
+    if (e.detail && e.detail.url.includes('header.html')) {
+      renderLanguageSwitcher();
+    }
+  });
 }

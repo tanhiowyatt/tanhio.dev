@@ -97,6 +97,17 @@ app.use('/partials', express.static(path.join(__dirname, './sites/shared/partial
 app.use('/pics', express.static(path.join(__dirname, './sites/shared/pics')));
 app.use('/files', express.static(path.join(__dirname, './sites/shared/files')));
 
+// Serve root-level favicons & apple-touch-icons (required for RSS readers and web browsers)
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, './sites/shared/pics/favicon.ico'));
+});
+app.get('/apple-touch-icon.png', (req, res) => {
+  res.sendFile(path.join(__dirname, './sites/shared/pics/apple-touch-icon.png'));
+});
+app.get('/apple-touch-icon-precomposed.png', (req, res) => {
+  res.sendFile(path.join(__dirname, './sites/shared/pics/apple-touch-icon.png'));
+});
+
 // --- MOUNT SUB-APPS (SUBPATH ROUTING FOR BACKWARD COMPATIBILITY) ---
 if (sites['blog']) {
   app.use('/blog', sites['blog']);

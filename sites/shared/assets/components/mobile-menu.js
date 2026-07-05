@@ -18,6 +18,10 @@ function restoreCookieBanner() {
 
 function openMenu() {
   if (!mobileMenu || !burgerButton) return;
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  if (scrollbarWidth > 0) {
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+  }
   mobileMenu.classList.add('menu-open');
   burgerButton.classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -30,6 +34,7 @@ function closeMenu() {
   mobileMenu.classList.remove('menu-open');
   burgerButton.classList.remove('active');
   document.body.style.overflow = '';
+  document.body.style.paddingRight = '';
   burgerButton.setAttribute('aria-expanded', 'false');
   restoreCookieBanner();
 }

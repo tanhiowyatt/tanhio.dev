@@ -99,17 +99,17 @@ This is the source code for [tanhio.dev](https://tanhio.dev) and its surrounding
 
 ## 📝 Publishing a Blog Post
 
-Blog posts are written in **MDX** (Markdown with YAML frontmatter) and require changes to **3 files**.
+Blog posts are written in **MDX** (Markdown with YAML frontmatter), support multiple languages, and require changes to **3 files**.
 
-### Step 1 — Create the MDX post file
+### Step 1 — Create the MDX post directory and files
 
-Create a new file at `sites/main/blog/posts/<slug>.mdx`:
+For a new post (e.g., `my-new-post`), create a subfolder under `sites/blog/posts/my-new-post/` and add the default and translated MDX files:
 
-```
-sites/main/blog/posts/my-new-post.mdx
-```
+* Default/Russian: `sites/blog/posts/my-new-post/my-new-post.mdx`
+* English: `sites/blog/posts/my-new-post/my-new-post.en.mdx`
+* Polish: `sites/blog/posts/my-new-post/my-new-post.pl.mdx`
 
-The file must start with a YAML frontmatter block, followed by Markdown content:
+The files must start with a YAML frontmatter block, followed by Markdown content:
 
 ```mdx
 ---
@@ -119,18 +119,11 @@ excerpt: "A short description shown on the blog index card. Plain text only."
 category: "it"
 ---
 
-![Post cover image](../images/my-new-post.png)
+![Post cover image](../../images/my-new-post.png)
 
 ## Introduction
 
 Your post content goes here in standard Markdown.
-
-**Bold text**, *italic*, `inline code`, [links](https://example.com)...
-
-## Section Two
-
-- List item one
-- List item two
 ```
 
 **Frontmatter fields:**
@@ -146,10 +139,10 @@ Your post content goes here in standard Markdown.
 
 ### Step 2 — Create the HTML page
 
-Copy `sites/main/blog/post-template.html` → `sites/main/blog/<slug>.html`:
+Copy `sites/blog/post-template.html` → `sites/blog/<slug>.html`:
 
 ```bash
-cp sites/main/blog/post-template.html sites/main/blog/my-new-post.html
+cp sites/blog/post-template.html sites/blog/my-new-post.html
 ```
 
 Then edit the following values in the new file (all occurrences):
@@ -164,34 +157,32 @@ Then edit the following values in the new file (all occurrences):
 | All `og:description` / `twitter:description` | `<head>` | Same as excerpt |
 | All `og:url` / `twitter:url` | `<head>` | `https://tanhio.dev/blog/my-new-post/` |
 
-The `<body>` content does **not** need to change — `post-renderer.js` automatically loads and renders the MDX file matching the current page URL.
+The `<body>` content does **not** need to change — `post-renderer.js` automatically loads and renders the MDX file matching the current page URL and selected language.
 
 ---
 
 ### Step 3 — Register the post in `blog.js`
 
-Open `sites/main/assets/components/blog.js` and find the `posts` array (around line 199).  
-Add your new post entry **at the top** of the array (newest first is the convention):
+Open `sites/shared/assets/components/blog.js` and find the `posts` array.  
+Add your new post entry **at the top** of the array (newest first):
 
 ```js
-const posts = [
-  { slug: 'my-new-post', file: '/blog/posts/my-new-post.mdx' }, // ← add here
-  { slug: 'industrial-ussr', file: '/blog/posts/industrial-ussr.mdx' },
-  { slug: 'icann', file: '/blog/posts/icann.mdx' },
-  // ...
-];
+  const posts = [
+    { slug: '/blog/my-new-post', file: '/blog/posts/my-new-post/my-new-post.mdx' }, // ← add here
+    { slug: '/blog/industrial-ussr', file: '/blog/posts/industrial-ussr/industrial-ussr.mdx' },
+    ...
 ```
 
-The `slug` must match the HTML filename and the MDX filename (without extension).
+The `slug` must match the HTML filename and the MDX subdirectory/filename (without extension).
 
 ---
 
 ### Step 4 — Add a cover image (optional)
 
-If your post starts with an image (`![alt](../images/my-new-post.png)`), place the image at:
+If your post starts with an image (e.g. `![alt](../../images/my-new-post.png)`), place the image at:
 
 ```
-sites/main/blog/images/my-new-post.png
+sites/blog/images/my-new-post.png
 ```
 
 Recommended size: **1200×630 px** (standard OG image ratio).
@@ -201,10 +192,12 @@ Recommended size: **1200×630 px** (standard OG image ratio).
 ### Summary checklist
 
 ```
-[ ] sites/main/blog/posts/my-new-post.mdx     — post content
-[ ] sites/main/blog/my-new-post.html          — post page (copied from post-template.html, meta tags updated)
-[ ] sites/main/assets/components/blog.js      — add entry to posts[] array
-[ ] sites/main/blog/images/my-new-post.png    — cover image (optional)
+[ ] sites/blog/posts/my-new-post/my-new-post.mdx     — Russian / default version
+[ ] sites/blog/posts/my-new-post/my-new-post.en.mdx  — English translation
+[ ] sites/blog/posts/my-new-post/my-new-post.pl.mdx  — Polish translation
+[ ] sites/blog/my-new-post.html                      — post page (copied from post-template.html, meta tags updated)
+[ ] sites/shared/assets/components/blog.js           — add entry to posts[] array
+[ ] sites/blog/images/my-new-post.png                — cover image (optional)
 ```
 
 ## 📄 License

@@ -159,4 +159,108 @@ describe('Blog', () => {
       expect(Blog.escapeHtml(123)).toBe('123');
     });
   });
+
+  describe('translation & language switching', () => {
+    beforeEach(() => {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.clear();
+      }
+      document.body.innerHTML = `
+        <h1 id="blog-title">Blog</h1>
+        <p id="blog-desc">Description</p>
+        <button id="filter-all">All</button>
+        <button id="filter-it">IT</button>
+        <button id="filter-non-it">Non-IT</button>
+        <div id="blog-lang-switcher"></div>
+        <div id="blog-posts"></div>
+      `;
+    });
+
+    test('should get and set language correctly', () => {
+      const originalLanguage = navigator.language;
+      Object.defineProperty(navigator, 'language', { value: '', configurable: true });
+      expect(Blog.getBlogLanguage()).toBe('en'); // default when no navigator language matches
+
+      Object.defineProperty(navigator, 'language', { value: 'pl-PL', configurable: true });
+      expect(Blog.getBlogLanguage()).toBe('pl'); // detect from navigator
+
+      Object.defineProperty(navigator, 'language', { value: originalLanguage, configurable: true });
+      Blog.setBlogLanguage('en');
+      expect(Blog.getBlogLanguage()).toBe('en');
+      Blog.setBlogLanguage('pl');
+      expect(Blog.getBlogLanguage()).toBe('pl');
+    });
+
+    test('should keep UI header and filters strictly in English', () => {
+      Blog.setBlogLanguage('ru');
+      Blog.updateBlogUIText();
+      expect(document.getElementById('blog-title').textContent).toBe('Blog');
+      expect(document.getElementById('blog-desc').textContent).toBe('Description');
+      expect(document.getElementById('filter-all').textContent).toBe('All');
+    });
+
+    test('should render language switcher buttons', () => {
+      Blog.setBlogLanguage('en');
+      Blog.renderLanguageSwitcher();
+      const switcher = document.getElementById('blog-lang-switcher');
+      expect(switcher.querySelectorAll('.blog-lang-btn').length).toBe(3);
+      
+      const activeBtn = switcher.querySelector('.blog-lang-btn.active');
+      expect(activeBtn.dataset.lang).toBe('en');
+    });
+
+    test('clicking language switcher button should redirect to localized URL', () => {
+      const originalLocation = globalThis.location;
+      delete globalThis.location;
+      globalThis.location = { href: 'http://localhost/blog/', pathname: '/blog/' };
+
+      Blog.renderLanguageSwitcher();
+      const switcher = document.getElementById('blog-lang-switcher');
+      const plBtn = switcher.querySelector('.blog-lang-btn[data-lang="pl"]');
+      
+      plBtn.click();
+      
+      expect(globalThis.location.href).toBe('/blog/pl/');
+
+      globalThis.location = originalLocation;
+    });
+
+    test('switching from RU to EN should route to /blog/en/...', () => {
+      const originalLocation = globalThis.location;
+      delete globalThis.location;
+      globalThis.location = { href: 'http://localhost/blog/ru/thum', pathname: '/blog/ru/thum' };
+
+      // Set lang initially to RU
+      document.documentElement.lang = 'ru';
+      Blog.renderLanguageSwitcher();
+      const switcher = document.getElementById('blog-lang-switcher');
+      const enBtn = switcher.querySelector('.blog-lang-btn[data-lang="en"]');
+      
+      enBtn.click();
+      
+      expect(globalThis.location.href).toBe('/blog/en/thum');
+
+      globalThis.location = originalLocation;
+      document.documentElement.removeAttribute('lang');
+    });
+
+    test('switching from PL to RU should route to /blog/ru/...', () => {
+      const originalLocation = globalThis.location;
+      delete globalThis.location;
+      globalThis.location = { href: 'http://localhost/blog/pl/thum', pathname: '/blog/pl/thum' };
+
+      // Set lang initially to PL
+      document.documentElement.lang = 'pl';
+      Blog.renderLanguageSwitcher();
+      const switcher = document.getElementById('blog-lang-switcher');
+      const ruBtn = switcher.querySelector('.blog-lang-btn[data-lang="ru"]');
+      
+      ruBtn.click();
+      
+      expect(globalThis.location.href).toBe('/blog/ru/thum');
+
+      globalThis.location = originalLocation;
+      document.documentElement.removeAttribute('lang');
+    });
+  });
 });

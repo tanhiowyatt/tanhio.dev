@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="PL">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111110" />
+  <title>Blog — tanhiowyatt</title>
+ 
+  <!-- Favicons-->
+  <link rel="icon" href="/pics/favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="/pics/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/pics/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/pics/favicon-16.png">
+  <link rel="apple-touch-icon" href="/pics/apple-touch-icon.png">
+  <link rel="manifest" href="/pics/site.webmanifest">
+ 
+  <!-- Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' https://unpkg.com; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://unpkg.com https://vitals.vercel-insights.com; base-uri 'self'; form-action 'self';">
+ 
+        <link rel="canonical" href="/blog/pl">
+                 
+  <!-- Tailwind CSS (Local Build) -->
+ 
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="../assets/vendor/bootstrap-icons/bootstrap-icons.min.css" />
+  <link rel="preconnect" href="" />
+ 
+  <!-- Shared site CSS -->
+  <link rel="stylesheet" href="../assets/site.css?v=34" />
+
+  <!-- Blog CSS -->
+  <link rel="stylesheet" href="../assets/styles/blog.css?v=2" />
+
+  <!-- Blog RSS Feeds -->
+  <link rel="alternate" type="application/rss+xml" title="Blog RSS Feed (RU)" href="/blog/feed.xml" />
+  <link rel="alternate" type="application/rss+xml" title="Blog RSS Feed (EN)" href="/blog/feed.en.xml" />
+  <link rel="alternate" type="application/rss+xml" title="Blog RSS Feed (PL)" href="/blog/feed.pl.xml" />
+
+  <!-- Modular JavaScript Components -->
+  <script src="../assets/vendor/js/purify.min.js" integrity="sha384-KI2VFGKRhVDym1z+XNqQxgWpLJ8egX+ITfvSY8iWdGZ86B1qIK7/DXPGncRhbK2w" crossorigin="anonymous"></script>
+  <script defer src="../assets/utils/security.js"></script>
+  <script defer src="../assets/utils/sanitize-html.js"></script>
+  <script defer src="../assets/utils/click-sound.js"></script>
+  <script defer src="../assets/components/ios-scroll-top.js"></script>
+  <script defer src="../assets/components/includes.js?v=6"></script>
+  <script defer src="../assets/components/mobile-menu.js"></script>
+  <script defer src="../assets/components/blog.js?v=11"></script>
+  <link rel="stylesheet" href="../assets/styles/output.css" />
+
+  <meta name="title" content="Blog — tanhiowyatt">
+  <meta name="description" content="Przemyślenia na temat inżynierii bezpieczeństwa, testów penetracyjnych i budowania bezpiecznych systemów.">
+
+  <!-- Open Graph / Facebook / Telegram -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Blog — tanhiowyatt">
+  <meta property="og:description" content="Przemyślenia na temat inżynierii bezpieczeństwa, testów penetracyjnych i budowania bezpiecznych systemów.">
+  <meta property="og:url" content="https://tanhio.dev/blog/pl">
+  <meta property="og:site_name" content="tanhiowyatt">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://tanhio.dev/pics/preview.png?v=3">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="960">
+  <meta property="og:image:height" content="480">
+  <meta property="og:image:alt" content="Blog — tanhiowyatt">
+
+  <!-- X (Twitter) -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://tanhio.dev/blog/pl">
+  <meta name="twitter:title" content="Blog — tanhiowyatt">
+  <meta name="twitter:description" content="Przemyślenia na temat inżynierii bezpieczeństwa, testów penetracyjnych i budowania bezpiecznych systemów.">
+  <meta name="twitter:image" content="https://tanhio.dev/pics/preview.png?v=3">
+</head>
+
+<body>
+  <!-- ===================== HEADER ===================== -->
+  <div data-include="../partials/header.html"></div>
+
+  <!-- ===================== BLOG SECTION ===================== -->
+  <section class="section">
+    <div class="mx-auto max-w-5xl px-4">
+      <div class="blog-container">
+        <div class="blog-intro">
+          <div class="flex items-center justify-between gap-4 mb-4">
+            <h1 id="blog-title" style="margin-bottom: 0;">Blog</h1>
+            <div id="blog-lang-switcher" class="hidden md:block w-36 sm:w-44 flex-shrink-0"></div>
+          </div>
+          <p id="blog-desc">Thoughts on security engineering, penetration testing, and building secure systems.</p>
+        </div>
+
+        <!-- Category Filter Switcher -->
+        <div class="blog-filter-wrapper mb-10 flex max-w-md w-full">
+          <div class="blog-filter-pill p-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md flex relative select-none w-full">
+            <button id="filter-all" class="blog-filter-btn active flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-white bg-[#4b68ff] shadow-lg shadow-[#4b68ff]/20" data-category="all">
+              All
+            </button>
+            <button id="filter-it" class="blog-filter-btn flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200" data-category="it">
+              IT
+            </button>
+            <button id="filter-non-it" class="blog-filter-btn flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200" data-category="non-it">
+              Non-IT
+            </button>
+          </div>
+        </div>
+
+        <div id="blog-posts" class="fade-in-active">
+          <!-- Blog posts will be loaded here by blog.js -->
+        </div>
+
+        <!-- RSS Feed Module -->
+        <article class="mt-16 blog-rss-module">
+          <div class="rss-info">
+            <h2 class="blog-post-title flex items-center gap-2" style="margin-bottom: 0.5rem; cursor: default;">
+              <i class="bi bi-rss-fill text-orange-500"></i>
+              <span>RSS Feeds</span>
+            </h2>
+            <p class="blog-post-excerpt" style="cursor: default;">Get the latest articles directly in your favorite feed reader.</p>
+          </div>
+          <div class="rss-btn-group flex-shrink-0">
+            <button class="rss-copy-btn" data-feed="/blog/feed.xml">
+              <i class="bi bi-rss"></i> <span class="rss-btn-text">RU</span>
+            </button>
+            <button class="rss-copy-btn" data-feed="/blog/feed.en.xml">
+              <i class="bi bi-rss"></i> <span class="rss-btn-text">EN</span>
+            </button>
+            <button class="rss-copy-btn" data-feed="/blog/feed.pl.xml">
+              <i class="bi bi-rss"></i> <span class="rss-btn-text">PL</span>
+            </button>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER (include) ===================== -->
+  <div data-include="../partials/footer.html"></div>
+  <!-- =================== END FOOTER =================== -->
+
+</body>
+
+</html>

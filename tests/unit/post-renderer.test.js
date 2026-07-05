@@ -69,4 +69,81 @@ describe('PostRenderer', () => {
       expect(html).toContain('<code>Code</code>');
     });
   });
+
+  describe('translation & language switching', () => {
+    beforeEach(() => {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.clear();
+      }
+      document.body.innerHTML = `
+        <a href="/blog/" id="blog-back-link">
+          <span>Back to Blog</span>
+        </a>
+        <div id="blog-lang-switcher"></div>
+        <div id="blog-post-header"></div>
+        <div id="blog-post-content"></div>
+      `;
+    });
+
+    test('should get and set language correctly', () => {
+      const originalLanguage = navigator.language;
+      Object.defineProperty(navigator, 'language', { value: '', configurable: true });
+      expect(PostRenderer.getBlogLanguage()).toBe('en'); // default when no navigator language matches
+
+      Object.defineProperty(navigator, 'language', { value: 'pl-PL', configurable: true });
+      expect(PostRenderer.getBlogLanguage()).toBe('pl'); // detect from navigator
+
+      Object.defineProperty(navigator, 'language', { value: originalLanguage, configurable: true });
+      PostRenderer.setBlogLanguage('en');
+      expect(PostRenderer.getBlogLanguage()).toBe('en');
+      PostRenderer.setBlogLanguage('pl');
+      expect(PostRenderer.getBlogLanguage()).toBe('pl');
+    });
+
+    test('should render language switcher buttons', () => {
+      PostRenderer.setBlogLanguage('pl');
+      PostRenderer.renderLanguageSwitcher();
+      const switcher = document.getElementById('blog-lang-switcher');
+      expect(switcher.querySelectorAll('.blog-lang-btn').length).toBe(3);
+      
+      const activeBtn = switcher.querySelector('.blog-lang-btn.active');
+      expect(activeBtn.dataset.lang).toBe('pl');
+    });
+
+    test('should localize back link URL and keep text as Back to Blog', async () => {
+      delete globalThis.location;
+      globalThis.location = new URL('http://localhost/blog/test-slug.html');
+
+      globalThis.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        text: () => Promise.resolve('---\ntitle: Success Title\n---\nBody')
+      });
+
+      document.documentElement.lang = 'pl';
+      await PostRenderer.loadBlogPost();
+
+      const backLink = document.getElementById('blog-back-link');
+      const backLinkSpan = document.querySelector('#blog-back-link span');
+      expect(backLink.getAttribute('href')).toBe('/blog/pl');
+      expect(backLinkSpan.textContent).toBe('Back to Blog');
+    });
+
+    test('clicking language switcher button should redirect to correct URL', () => {
+      const originalLocation = globalThis.location;
+      delete globalThis.location;
+      globalThis.location = { href: 'http://localhost/blog/pl/thum', pathname: '/blog/pl/thum' };
+
+      document.documentElement.lang = 'pl';
+      PostRenderer.renderLanguageSwitcher();
+      const switcher = document.getElementById('blog-lang-switcher');
+      const enBtn = switcher.querySelector('.blog-lang-btn[data-lang="en"]');
+      
+      enBtn.click();
+      
+      expect(globalThis.location.href).toBe('/blog/en/thum');
+
+      globalThis.location = originalLocation;
+      document.documentElement.removeAttribute('lang');
+    });
+  });
 });
