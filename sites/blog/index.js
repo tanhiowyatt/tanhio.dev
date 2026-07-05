@@ -68,7 +68,7 @@ function extractFirstImage(mdxContent, lang, slug) {
     const cleanSrc = src.replace(/^(\.\.\/|\.\/)+/, '');
     return `https://tanhio.dev/blog/${lang}/posts/${slug}/${cleanSrc}`;
   }
-  return src;
+  return `https://tanhio.dev${src}`;
 }
 
 // Convert simple markdown to HTML for <description> content

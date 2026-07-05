@@ -3,6 +3,12 @@
 User-agent: *
 Allow: /assets/
 Allow: /pics/
+Allow: /blog/ru/posts/
+Allow: /blog/en/posts/
+Allow: /blog/pl/posts/
+Allow: /blog/feed.xml
+Allow: /blog/feed.en.xml
+Allow: /blog/feed.pl.xml
 Disallow: /admin/
 Disallow: /login
 Disallow: /account/
