@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#111110" />
   <title>Блог — tanhiowyatt</title>
- 
+
   <!-- Favicons-->
   <link rel="icon" href="/pics/favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="/pics/favicon.svg">
@@ -14,19 +14,19 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/pics/favicon-16.png">
   <link rel="apple-touch-icon" href="/pics/apple-touch-icon.png">
   <link rel="manifest" href="/pics/site.webmanifest">
- 
+
   <!-- Content Security Policy -->
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' https://unpkg.com; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://unpkg.com https://vitals.vercel-insights.com; base-uri 'self'; form-action 'self';">
- 
-        <link rel="canonical" href="/blog/ru">
-                 
+
+  <link rel="canonical" href="/blog/ru">
+
   <!-- Tailwind CSS (Local Build) -->
- 
+
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="../assets/vendor/bootstrap-icons/bootstrap-icons.min.css" />
   <link rel="preconnect" href="" />
- 
+
   <!-- Shared site CSS -->
   <link rel="stylesheet" href="../assets/site.css?v=34" />
 
@@ -39,7 +39,9 @@
   <link rel="alternate" type="application/rss+xml" title="Blog RSS Feed (PL)" href="/blog/feed.pl.xml" />
 
   <!-- Modular JavaScript Components -->
-  <script src="../assets/vendor/js/purify.min.js" integrity="sha384-KI2VFGKRhVDym1z+XNqQxgWpLJ8egX+ITfvSY8iWdGZ86B1qIK7/DXPGncRhbK2w" crossorigin="anonymous"></script>
+  <script src="../assets/vendor/js/purify.min.js"
+    integrity="sha384-KI2VFGKRhVDym1z+XNqQxgWpLJ8egX+ITfvSY8iWdGZ86B1qIK7/DXPGncRhbK2w"
+    crossorigin="anonymous"></script>
   <script defer src="../assets/utils/security.js"></script>
   <script defer src="../assets/utils/sanitize-html.js"></script>
   <script defer src="../assets/utils/click-sound.js"></script>
@@ -50,12 +52,12 @@
   <link rel="stylesheet" href="../assets/styles/output.css" />
 
   <meta name="title" content="Блог — tanhiowyatt">
-  <meta name="description" content="Мысли об инженерии безопасности, пентестах и создании защищенных систем.">
+  <meta name="description" content="Мысли о безопасности, пентесте и создании защищенных систем.">
 
   <!-- Open Graph / Facebook / Telegram -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Блог — tanhiowyatt">
-  <meta property="og:description" content="Мысли об инженерии безопасности, пентестах и создании защищенных систем.">
+  <meta property="og:description" content="Мысли о безопасности, пентесте и создании защищенных систем.">
   <meta property="og:url" content="https://tanhio.dev/blog/ru">
   <meta property="og:site_name" content="tanhiowyatt">
   <meta property="og:locale" content="en_US">
@@ -69,7 +71,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://tanhio.dev/blog/ru">
   <meta name="twitter:title" content="Блог — tanhiowyatt">
-  <meta name="twitter:description" content="Мысли об инженерии безопасности, пентестах и создании защищенных систем.">
+  <meta name="twitter:description" content="Мысли о безопасности, пентесте и создании защищенных систем.">
   <meta name="twitter:image" content="https://tanhio.dev/pics/preview.png?v=3">
 </head>
 
@@ -91,14 +93,21 @@
 
         <!-- Category Filter Switcher -->
         <div class="blog-filter-wrapper mb-10 flex max-w-md w-full">
-          <div class="blog-filter-pill p-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md flex relative select-none w-full">
-            <button id="filter-all" class="blog-filter-btn active flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-white bg-[#4b68ff] shadow-lg shadow-[#4b68ff]/20" data-category="all">
+          <div
+            class="blog-filter-pill p-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md flex relative select-none w-full">
+            <button id="filter-all"
+              class="blog-filter-btn active flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-white bg-[#4b68ff] shadow-lg shadow-[#4b68ff]/20"
+              data-category="all">
               All
             </button>
-            <button id="filter-it" class="blog-filter-btn flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200" data-category="it">
+            <button id="filter-it"
+              class="blog-filter-btn flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200"
+              data-category="it">
               IT
             </button>
-            <button id="filter-non-it" class="blog-filter-btn flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200" data-category="non-it">
+            <button id="filter-non-it"
+              class="blog-filter-btn flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200"
+              data-category="non-it">
               Non-IT
             </button>
           </div>
@@ -115,7 +124,8 @@
               <i class="bi bi-rss-fill text-orange-500"></i>
               <span>RSS Feeds</span>
             </h2>
-            <p class="blog-post-excerpt" style="cursor: default;">Get the latest articles directly in your favorite feed reader.</p>
+            <p class="blog-post-excerpt" style="cursor: default;">Get the latest articles directly in your favorite feed
+              reader.</p>
           </div>
           <div class="rss-btn-group flex-shrink-0">
             <button class="rss-copy-btn" data-feed="/blog/feed.xml">

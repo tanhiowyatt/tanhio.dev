@@ -72,7 +72,7 @@ function extractFirstImage(mdxContent, lang, slug) {
 }
 
 // Convert simple markdown to HTML for <description> content
-function mdToHtml(md) {
+function mdToHtml(md, lang, slug, coverImage) {
   if (!md) return '';
   return md
     .replace(/^### (.+)$/gm, '<h3>$1</h3>')
@@ -81,7 +81,21 @@ function mdToHtml(md) {
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     .replace(/`(.+?)`/g, '<code>$1</code>')
-    .replace(/!\[.*?\]\([^)]+\)/g, '') // strip images (we use enclosure/media)
+    .replace(/!\[(.*?)\]\(([^)]+)\)/g, (match, alt, src) => {
+      let absoluteSrc = src.trim();
+      if (!absoluteSrc.startsWith('http')) {
+        if (absoluteSrc.startsWith('/')) {
+          absoluteSrc = `https://tanhio.dev${absoluteSrc}`;
+        } else {
+          const cleanSrc = absoluteSrc.replace(/^(\.\.\/|\.\/)+/, '');
+          absoluteSrc = `https://tanhio.dev/blog/${lang}/posts/${slug}/${cleanSrc}`;
+        }
+      }
+      if (coverImage && absoluteSrc === coverImage) {
+        return '';
+      }
+      return `<img src="${absoluteSrc}" alt="${escapeXML(alt)}" />`;
+    })
     .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>')
     .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
     .replace(/(<li>.*<\/li>\n?)+/g, s => `<ul>${s}</ul>`)
@@ -160,12 +174,12 @@ function generateRSSFeed(lang) {
 
   const xmlItems = items.map(item => {
     const pubDate = item.date.toUTCString();
-    const link = `${BASE}/blog/${item.slug}`;
+    const link = `${BASE}/blog/${targetLang}/${item.slug}`;
     const safeTitle = escapeXML(item.title);
     // Full HTML content wrapped in CDATA
     const htmlContent = item.coverImage
-      ? `<img src="${item.coverImage}" alt="${escapeXML(item.title)}" />\n${mdToHtml(item.content)}`
-      : mdToHtml(item.content);
+      ? `<img src="${item.coverImage}" alt="${escapeXML(item.title)}" />\n${mdToHtml(item.content, targetLang, item.slug, item.coverImage)}`
+      : mdToHtml(item.content, targetLang, item.slug, item.coverImage);
 
     const enclosureTags = item.coverImage
       ? `\n      <enclosure url="${item.coverImage}" type="image/png" length="0" />\n      <media:content url="${item.coverImage}" medium="image" />`
