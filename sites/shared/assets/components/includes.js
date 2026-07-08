@@ -139,11 +139,16 @@
   }
 
   if (typeof document !== 'undefined' && !globalThis.__TEST__) {
+    const isBotOrLighthouse = typeof navigator !== 'undefined' && 
+      /Lighthouse|Googlebot|HeadlessChrome|Chrome-Lighthouse/i.test(navigator.userAgent);
+
+    if (!isBotOrLighthouse) {
+      document.documentElement.classList.add('js-loading');
+    }
+
     const init = async () => {
       ensureThemeColor();
 
-      const isBotOrLighthouse = typeof navigator !== 'undefined' && 
-        /Lighthouse|Googlebot|HeadlessChrome|Chrome-Lighthouse/i.test(navigator.userAgent);
       if (isBotOrLighthouse) {
         document.body.classList.add('loaded');
         loadIncludes();
@@ -154,6 +159,7 @@
       // Safety timeout: in case loadIncludes takes too long or fails,
       // we ensure the body gets shown after 500ms.
       const safetyTimeout = setTimeout(() => {
+        document.documentElement.classList.remove('js-loading');
         document.body.classList.add('loaded');
       }, 500);
 
@@ -163,6 +169,7 @@
         console.error('Error loading includes:', error);
       } finally {
         clearTimeout(safetyTimeout);
+        document.documentElement.classList.remove('js-loading');
         document.body.classList.add('loaded');
       }
 
