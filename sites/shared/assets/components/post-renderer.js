@@ -460,13 +460,18 @@ function initRSSCopyButtons() {
 
       navigator.clipboard.writeText(absoluteUrl).then(() => {
         const textSpan = btn.querySelector('.rss-btn-text');
-        if (textSpan) {
+        const iconEl = btn.querySelector('i');
+        if (textSpan && iconEl) {
           const originalText = textSpan.textContent;
+          const originalIconClass = iconEl.className;
+          
           textSpan.textContent = 'Copied!';
+          iconEl.className = 'bi bi-check-lg copy-check-icon';
           btn.classList.add('active');
 
           setTimeout(() => {
             textSpan.textContent = originalText;
+            iconEl.className = originalIconClass;
             btn.classList.remove('active');
           }, 2000);
         }

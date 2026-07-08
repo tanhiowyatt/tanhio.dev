@@ -6,7 +6,7 @@
   word-break: normal;
   line-break: anywhere;
   white-space: normal;
-  padding-right: 56px;
+  padding-right: 96px;
   display: block;
 }
 
@@ -37,7 +37,7 @@
   color: #dbe4ff;
   box-shadow: 0 3px 10px rgba(2, 6, 23, .45);
   cursor: pointer;
-  transition: filter var(--speed) var(--ease);
+  transition: all var(--speed) var(--ease);
 }
 
 .copy-btn:hover {
@@ -49,13 +49,26 @@
   cursor: not-allowed;
 }
 
+.copy-btn.active {
+  width: 88px;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  opacity: 1 !important;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .stub-toast {
   position: fixed;
   left: 50%;
   bottom: 18px;
   transform: translateX(-50%);
-  background: rgba(10, 15, 34, .92);
-  color: #e5e7eb;
+  background: rgba(26, 26, 25, .95);
+  color: #dbe4ff;
   border: 1px solid rgba(255, 255, 255, .12);
   padding: .6rem .9rem;
   border-radius: .75rem;
@@ -68,4 +81,19 @@
 
 .stub-toast.show {
   opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .addr {
+    padding-right: 56px;
+  }
+  .copy-btn.active {
+    width: 40px !important;
+  }
+  .copy-btn.active .copy-text-label {
+    display: none !important;
+  }
+  .copy-btn.active .copy-check-icon {
+    margin-right: 0 !important;
+  }
 }

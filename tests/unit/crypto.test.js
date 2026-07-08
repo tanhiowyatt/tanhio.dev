@@ -39,15 +39,12 @@ describe('Crypto', () => {
   });
 
   describe('copyText', () => {
-    test('should copy text and show toast', async () => {
+    test('should copy text successfully', async () => {
       const success = await Crypto.copyText('test text');
       expect(success).toBe(true);
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith('test text');
       
       const toast = document.getElementById('copy-toast');
-      expect(toast.classList.contains('show')).toBe(true);
-      
-      jest.advanceTimersByTime(2000);
       expect(toast.classList.contains('show')).toBe(false);
     });
   });

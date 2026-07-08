@@ -139,9 +139,24 @@
   }
 
   if (typeof document !== 'undefined' && !globalThis.__TEST__) {
-    const init = () => {
+    const init = async () => {
       ensureThemeColor();
-      loadIncludes();
+      
+      // Safety timeout: in case loadIncludes takes too long or fails,
+      // we ensure the body gets shown after 500ms.
+      const safetyTimeout = setTimeout(() => {
+        document.body.classList.add('loaded');
+      }, 500);
+
+      try {
+        await loadIncludes();
+      } catch (error) {
+        console.error('Error loading includes:', error);
+      } finally {
+        clearTimeout(safetyTimeout);
+        document.body.classList.add('loaded');
+      }
+
       initCookieConsent();
     };
     if (document.readyState === 'loading') {

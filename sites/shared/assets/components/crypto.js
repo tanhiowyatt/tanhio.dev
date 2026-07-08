@@ -31,7 +31,6 @@ async function copyText(text) {
   try {
     if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(text);
-      showToast('Copied to clipboard');
       return true;
     }
     throw new Error('Clipboard API unavailable');
@@ -58,14 +57,15 @@ async function handleCopyClick(event) {
   const success = await copyText(text);
 
   if (success) {
-    const label = (targetSelector || '').replace('#addr-', '').toUpperCase();
     const originalText = button.innerHTML;
-    button.innerHTML = '<i class="bi bi-check-lg"></i> ' + label;
+    button.innerHTML = '<i class="bi bi-check-lg copy-check-icon"></i><span class="copy-text-label">Copied!</span>';
     button.disabled = true;
+    button.classList.add('active');
 
     setTimeout(() => {
       button.innerHTML = originalText;
       button.disabled = false;
+      button.classList.remove('active');
     }, 2000);
   }
 }
