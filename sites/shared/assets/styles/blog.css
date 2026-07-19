@@ -508,3 +508,7 @@ header .brand-avatar {
 .rss-copy-btn i {
   font-size: 0.875rem;
 }
+
+.blog-rss-module .bi-rss-fill {
+  color: inherit !important;
+}

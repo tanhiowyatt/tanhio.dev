@@ -278,9 +278,9 @@ function syncMobileLanguageSwitcher(currentLang, onLangChange) {
   buttons.forEach(btn => {
     const isBtnActive = btn.dataset.lang === currentLang;
     if (isBtnActive) {
-      btn.className = 'blog-lang-btn active flex-1 py-4 text-sm font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-white';
+      btn.className = 'blog-lang-btn active flex-1 py-4 text-sm font-semibold rounded-xl uppercase tracking-wider transition-all duration-300 cursor-pointer text-white';
     } else {
-      btn.className = 'blog-lang-btn flex-1 py-4 text-sm font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200';
+      btn.className = 'blog-lang-btn flex-1 py-4 text-sm font-semibold rounded-xl uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200';
     }
 
     btn.onclick = (e) => {
@@ -309,8 +309,8 @@ function renderLanguageSwitcher() {
         ${languages.map(lang => {
           const isActive = lang.code === currentLang;
           const btnClass = isActive
-            ? 'blog-lang-btn active flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-white'
-            : 'blog-lang-btn flex-1 px-6 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200';
+            ? 'blog-lang-btn active flex-1 px-3 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-white'
+            : 'blog-lang-btn flex-1 px-3 py-2 text-xs font-semibold rounded-full uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200';
           return `<button class="${btnClass}" data-lang="${lang.code}">${lang.label}</button>`;
         }).join('')}
       </div>
