@@ -1,0 +1,162 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0  # Required for accurate blame/history
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@22918119ff8e1ca75a623e15c8296b6ea4fbe28f # v8.2.1 nosemgrep
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  security:
+    name: Security Scan (Semgrep)
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep:1.120.0
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Run Semgrep
+        run: |
+          semgrep ci --config auto --config p/nginx --config p/security-audit \
+            --exclude-rule html.security.audit.missing-integrity.missing-integrity \
+            --exclude-rule generic.nginx.security.possible-h2c-smuggling.possible-nginx-h2c-smuggling
+
+  audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+
+  secrets:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@ba0a524d6e51744d9d4e306bc57ac5d6ca5173ea # main (2024-05-11)
+        with:
+          path: ./
+          base: ""
+          head: ${{ github.ref_name }}
+          extra_args: --debug --only-verified
+
+  links:
+    name: Link Checker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check for broken links
+        uses: lycheeverse/lychee-action@2b973e86fc7b1f6b36a93795fe2c9c6ae1118621 # v1.10.0
+        with:
+          args: --exclude-mail --exclude "tribute.tg" --verbose --no-progress './**/*.md' './**/*.html'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  tests:
+    name: Run Full Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies (Root)
+        run: npm ci --ignore-scripts
+
+      - name: Install dependencies (Tests)
+        run: |
+          cd tests
+          npm ci --ignore-scripts
+
+      - name: Install Playwright Browsers
+        run: |
+          cd tests
+          ./node_modules/.bin/playwright install --with-deps
+
+      - name: Start Server and Run Tests
+        run: |
+          npm start &
+          # Wait for server to be ready
+          ./node_modules/.bin/wait-on http://localhost:5173 --timeout 30000
+          # Run tests
+          cd tests
+          npm run test:coverage
+
+  integration:
+    name: Server Integration Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Start Server and Check Endpoints
+        run: |
+          npm start &
+          # Wait for server to be ready
+          ./node_modules/.bin/wait-on http://localhost:5173 --timeout 30000
+          # Test main endpoints
+          curl -f http://localhost:5173/
+          curl -f http://localhost:5173/blog
+          curl -f http://localhost:5173/tools
+          curl -f http://localhost:5173/projects
+
+  iac_security:
+    name: IaC Security (Checkov)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Checkov GitHub Action
+        uses: bridgecrewio/checkov-action@4048c972aae68d0b983a48bb3479aab2d877b898 # master (2024-05-11)
+        with:
+          directory: ./infra
+          framework: all
+          soft_fail: false
+          quiet: true
+
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: Audit URLs using Lighthouse
+        uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12.1.0
+        with:
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+

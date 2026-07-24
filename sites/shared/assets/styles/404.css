@@ -1,0 +1,84 @@
+/* Custom styles for the 404 page */
+
+:root {
+  --site-bg-color: #111110;
+  --text-color: #ffffff;
+  --text-secondary: #e5e7eb;
+}
+
+body.error-page {
+  background-color: var(--site-bg-color);
+  color: var(--text-color);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.error-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(100vh - 120px);
+  min-height: calc(100dvh - 120px);
+  padding: 4rem 1.5rem;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+  /* Animations for loading container contents */
+  opacity: 0;
+  transform: translateY(10px);
+  animation: errorFadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
+}
+
+.error-code {
+  font-size: clamp(8rem, 22vw, 18rem);
+  font-weight: 800;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  color: var(--text-secondary);
+  user-select: none;
+  margin-bottom: 4.5rem;
+  /* Slightly stretch horizontally to match the extended font aesthetic */
+  transform: scaleX(1.08);
+  display: inline-block;
+}
+
+
+.back-home-link {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #ffffff;
+  background-color: transparent;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid #ffffff;
+  border-radius: 9999px;
+  transition: all var(--speed, 240ms) var(--ease, cubic-bezier(.22, .61, .36, 1));
+  user-select: none;
+}
+
+.back-home-link:hover {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.back-home-link:active {
+  transform: scale(0.97);
+}
+
+
+@keyframes errorFadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

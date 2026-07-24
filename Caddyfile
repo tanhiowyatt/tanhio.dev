@@ -1,0 +1,13 @@
+{
+    email app@tanhio.dev
+}
+
+# Открываем доступ по HTTP для любых адресов (включая 192.168.97.2)
+:80 {
+    reverse_proxy website:5173
+}
+
+# Если задан домен (например, tanhio.dev), настраиваем HTTPS для него
+{$DOMAIN_NAME} {
+    reverse_proxy website:5173
+}

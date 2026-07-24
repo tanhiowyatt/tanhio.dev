@@ -1,0 +1,36 @@
+services:
+  caddy:
+    profiles: ["with-webserver"]
+    image: caddy:2.10.0
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # Needed for HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile # Mount Caddy config file
+      - caddy_data:/data # Mount persistent data volume for certs etc.
+      - caddy_config:/config # Mount persistent config volume
+    environment:
+      # Pass domain name for use in Caddyfile
+      # Email is configured via Caddyfile global options
+      - DOMAIN_NAME=${DOMAIN_NAME}
+    depends_on:
+      - website
+
+  website:
+    container_name: website
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=production
+      - PORT=5173
+    restart: unless-stopped
+
+volumes:
+  caddy_data: # Persistent volume for Caddy's certificates and state
+  caddy_config: # Persistent volume for Caddy's configuration cache (optional but good practice)

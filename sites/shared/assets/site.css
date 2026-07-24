@@ -1,0 +1,173 @@
+@import url('styles/fonts.css');
+@import url('styles/variables.css');
+@import url('styles/responsive.css?v=3');
+@import url('styles/scrollbar.css');
+@import url('styles/header.css?v=8');
+@import url('styles/mobile-ios.css?v=4');
+@import url('styles/hero.css?v=6');
+@import url('styles/footer.css');
+
+:root {
+  color-scheme: dark;
+  --site-bg-color: #111110;
+}
+
+html {
+  scroll-behavior: smooth;
+  min-height: 100%;
+  background: #111110;
+  overscroll-behavior-x: none;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: #e5e7eb;
+  font-family: 'Open Sans', system-ui, sans-serif;
+  overscroll-behavior-x: none;
+  background: #111110;
+  overflow-x: clip;
+  width: 100%;
+  max-width: 100vw;
+  position: relative;
+}
+
+html.js-loading body {
+  opacity: 0;
+  /* Pure CSS safety net: force visibility after 2s even if JS never runs.
+     This guarantees Lighthouse FCP regardless of script execution status. */
+  animation: js-loading-fallback 0s 2s forwards;
+}
+
+@keyframes js-loading-fallback {
+  to { opacity: 1; }
+}
+
+
+body.loaded {
+  animation: fadeIn 0.4s var(--ease) forwards;
+}
+
+
+body.fade-out {
+  animation: fadeOut 0.3s var(--ease) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+
+a,
+button,
+footer {
+  transition: all var(--speed) var(--ease);
+}
+
+header {
+  padding-top: 30px;
+}
+
+
+.section {
+  padding-top: var(--section-py);
+  padding-bottom: var(--section-py);
+}
+
+.section-zero-top {
+  padding-top: 0;
+}
+
+.section-zero-bottom {
+  padding-bottom: 0;
+}
+
+.static-tile {
+  position: relative;
+  background: #1A1A19;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 1.5rem;
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, .08), 0 10px 24px rgba(2, 6, 23, .45);
+}
+
+
+.soc svg,
+.soc i {
+  display: block;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  fill: currentColor;
+  shape-rendering: geometricPrecision;
+}
+
+.soc .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.soc .bi {
+  font-size: 18px;
+  line-height: 1;
+  display: block;
+}
+
+/* Ensure Cookie Consent Banner uses 'Open Sans' */
+#cookie-consent-banner,
+#cookie-consent-banner button,
+#cookie-consent-banner h4,
+#cookie-consent-banner p {
+  font-family: 'Open Sans', system-ui, sans-serif !important;
+}
+
+#cookie-consent-banner {
+  background-color: #090908 !important;
+  /* solid background = header color, no transparency */
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+#cookie-consent-banner.cookie-hidden {
+  opacity: 0 !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.copy-check-icon {
+  font-size: 10px !important;
+  display: inline-block !important;
+  margin-right: 4px !important;
+  animation: popScale 0.3s var(--ease) forwards;
+}
+
+@keyframes popScale {
+  0% {
+    transform: scale(0.6);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

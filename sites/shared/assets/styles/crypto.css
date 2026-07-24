@@ -1,0 +1,99 @@
+.addr {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  color: #cbd5e1;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-break: anywhere;
+  white-space: normal;
+  padding-right: 96px;
+  display: block;
+}
+
+.addr-row {
+  position: relative;
+  min-height: 34px;
+}
+
+.addr-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+}
+
+.copy-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 34px;
+  padding: 0;
+  border-radius: .6rem;
+  border: 1px solid rgba(255, 255, 255, .12);
+  background: #1A1A19;
+  color: #dbe4ff;
+  box-shadow: 0 3px 10px rgba(2, 6, 23, .45);
+  cursor: pointer;
+  transition: all var(--speed) var(--ease);
+}
+
+.copy-btn:hover {
+  filter: brightness(1.1);
+}
+
+.copy-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.copy-btn.active {
+  width: 88px;
+  background: #2a2a29 !important; /* Solid dark color to satisfy contrast analyzer */
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  opacity: 1 !important;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stub-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  background: rgba(26, 26, 25, .95);
+  color: #dbe4ff;
+  border: 1px solid rgba(255, 255, 255, .12);
+  padding: .6rem .9rem;
+  border-radius: .75rem;
+  box-shadow: 0 10px 24px rgba(2, 6, 23, .55);
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s var(--ease);
+}
+
+.stub-toast.show {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .addr {
+    padding-right: 56px;
+  }
+  .copy-btn.active {
+    width: 40px !important;
+  }
+  .copy-btn.active .copy-text-label {
+    display: none !important;
+  }
+  .copy-btn.active .copy-check-icon {
+    margin-right: 0 !important;
+  }
+}
