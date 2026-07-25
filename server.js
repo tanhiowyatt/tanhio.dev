@@ -118,7 +118,24 @@ app.get('/apple-touch-icon-precomposed.png', (req, res) => {
 
 // --- MOUNT SUB-APPS (SUBPATH ROUTING FOR BACKWARD COMPATIBILITY) ---
 if (sites['blog']) {
-  app.use('/blog', sites['blog']);
+  app.use('/blog', (req, res, next) => {
+    const host = req.headers.host || '';
+    const cleanHost = host.split(':')[0].toLowerCase();
+    const prodDomain = 'tanhio.dev';
+    
+    let subdomain = null;
+    if (cleanHost.endsWith(`.${prodDomain}`)) {
+      subdomain = cleanHost.slice(0, -(prodDomain.length + 1));
+    } else if (cleanHost.endsWith('.localhost')) {
+      subdomain = cleanHost.slice(0, -('.localhost'.length));
+    }
+    
+    if (subdomain && subdomain !== 'www' && subdomain !== 'blog') {
+      return next(); // Skip blog for unknown subdomains
+    }
+    
+    sites['blog'](req, res, next);
+  });
 }
 
 // Security headers (Helmet)
@@ -172,7 +189,22 @@ app.use((req, res, next) => {
 });
 
 // CSRF token endpoint
-app.get('/api/csrf-token', (req, res) => {
+app.get('/api/csrf-token', (req, res, next) => {
+  const host = req.headers.host || '';
+  const cleanHost = host.split(':')[0].toLowerCase();
+  const prodDomain = 'tanhio.dev';
+  
+  let subdomain = null;
+  if (cleanHost.endsWith(`.${prodDomain}`)) {
+    subdomain = cleanHost.slice(0, -(prodDomain.length + 1));
+  } else if (cleanHost.endsWith('.localhost')) {
+    subdomain = cleanHost.slice(0, -('.localhost'.length));
+  }
+  
+  if (subdomain && subdomain !== 'www' && subdomain !== 'blog') {
+    return next(); // Skip CSRF token endpoint for unknown subdomains
+  }
+  
   let secret = req.cookies._csrf || csrfProtection.secretSync();
   if (!req.cookies._csrf) {
     res.cookie('_csrf', secret, {
@@ -195,15 +227,56 @@ app.use((req, res, next) => {
   
   // Extract subdomain if matching the domain format
   let subdomain = null;
+  let targetHost = null;
+  const port = host.split(':')[1] ? `:${host.split(':')[1]}` : '';
+
   if (cleanHost.endsWith(`.${prodDomain}`)) {
     subdomain = cleanHost.slice(0, -(prodDomain.length + 1));
+    targetHost = `${prodDomain}${port}`;
   } else if (cleanHost.endsWith('.localhost')) {
     subdomain = cleanHost.slice(0, -('.localhost'.length));
+    targetHost = `localhost${port}`;
   }
   
+
   // Route to the corresponding subdomain site if it exists (excluding www and blog)
-  if (subdomain && subdomain !== 'www' && subdomain !== 'blog' && sites[subdomain]) {
-    return sites[subdomain](req, res, next);
+  if (subdomain && subdomain !== 'www') {
+    if (subdomain !== 'blog' && sites[subdomain]) {
+      return sites[subdomain](req, res, next);
+    }
+    
+    // For unknown subdomains:
+    // If they are trying to navigate from within the subdomain (e.g. clicking a link on the 404 page),
+    // redirect them to the main domain. Otherwise, serve a 404 page.
+    const referer = req.headers.referer || '';
+    const isNavigatingFromSubdomain = referer.includes(`://${subdomain}.`);
+
+    if (isNavigatingFromSubdomain) {
+      if (targetHost && targetHost !== host) {
+        const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+        let redirectPath = req.originalUrl;
+        
+        // Special handling: redirect blog subdomain to the /blog subpath
+        if (subdomain === 'blog') {
+          redirectPath = `/blog${redirectPath}`;
+        }
+        
+        // Prevent Open Redirect (ensure redirectPath does not start with double slash or backslash)
+        if (redirectPath.startsWith('//') || redirectPath.startsWith('\\')) {
+          redirectPath = '/' + redirectPath.replace(/^[\/\\]+/, '');
+        }
+        
+        return res.redirect(301, `${protocol}://${targetHost}${redirectPath}`);
+      }
+    }
+
+    // Fallback 404 if not navigating from within the subdomain
+    res.status(404);
+    const fallback404 = path.join(sitesDir, 'main/404.html');
+    if (fs.existsSync(fallback404)) {
+      return res.sendFile(fallback404);
+    }
+    return res.send('404 Not Found');
   }
   
   // Default fallback (tanhio.dev, www.tanhio.dev, localhost, etc.)
