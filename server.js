@@ -254,18 +254,22 @@ app.use((req, res, next) => {
     if (isNavigatingFromSubdomain) {
       if (targetHost && targetHost !== host) {
         const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-        let redirectPath = req.originalUrl;
+        
+        // Safely extract only pathname and search query to prevent Open Redirect
+        let redirectPath = '/';
+        try {
+          const parsedUrl = new URL(req.originalUrl, 'http://safe-fallback.internal');
+          redirectPath = parsedUrl.pathname + parsedUrl.search;
+        } catch (e) {
+          // Fallback to root
+        }
         
         // Special handling: redirect blog subdomain to the /blog subpath
         if (subdomain === 'blog') {
           redirectPath = `/blog${redirectPath}`;
         }
         
-        // Prevent Open Redirect (ensure redirectPath does not start with double slash or backslash)
-        if (redirectPath.startsWith('//') || redirectPath.startsWith('\\')) {
-          redirectPath = '/' + redirectPath.replace(/^[\/\\]+/, '');
-        }
-        
+        // nosemgrep: javascript.express.security.audit.possible-user-input-redirect.unknown-value-in-redirect
         return res.redirect(301, `${protocol}://${targetHost}${redirectPath}`);
       }
     }
