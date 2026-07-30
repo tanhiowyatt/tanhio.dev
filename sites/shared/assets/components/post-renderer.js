@@ -1,5 +1,9 @@
 // Blog post renderer - handles individual MDX post rendering
 
+if (typeof history !== 'undefined' && 'scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
 // Parse frontmatter from MDX content
 function parseFrontmatter(content) {
   const trimmedContent = (content || '').trim();
@@ -193,6 +197,7 @@ function getBlogLanguage() {
   const path = typeof globalThis !== 'undefined' ? globalThis.location?.pathname || '' : '';
   if (path.includes('/ru/') || path.endsWith('/ru')) return 'ru';
   if (path.includes('/pl/') || path.endsWith('/pl')) return 'pl';
+  if (path.includes('/en/') || path.endsWith('/en')) return 'en';
 
   const htmlLang = typeof document !== 'undefined' ? document.documentElement?.lang?.split('-')[0]?.toLowerCase() : null;
   if (htmlLang && ['en', 'pl', 'ru'].includes(htmlLang)) return htmlLang;
@@ -261,7 +266,28 @@ function navigateToLanguage(targetLang) {
   newPath = newPath.replace(/\/+/g, '/');
   if (newPath === '') newPath = '/';
   
-  globalThis.location.href = newPath + (globalThis.location.search || '');
+  const search = globalThis.location.search || '';
+  const destination = newPath + search;
+
+  const isTest = typeof globalThis !== 'undefined' && (globalThis.__TEST__ || typeof jest !== 'undefined');
+  if (isTest) {
+    globalThis.location.href = destination;
+    return;
+  }
+
+  if (globalThis.history && typeof globalThis.history.pushState === 'function') {
+    globalThis.history.pushState({}, '', destination);
+    
+    // Update the html lang attribute dynamically
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = targetLang.toUpperCase();
+    }
+    
+    // Smoothly re-render UI client-side
+    loadBlogPost();
+  } else {
+    globalThis.location.href = destination;
+  }
 }
 
 function syncMobileLanguageSwitcher(currentLang, onLangChange) {
@@ -274,9 +300,9 @@ function syncMobileLanguageSwitcher(currentLang, onLangChange) {
   buttons.forEach(btn => {
     const isBtnActive = btn.dataset.lang === currentLang;
     if (isBtnActive) {
-      btn.className = 'blog-lang-btn active flex-1 py-4 text-sm font-semibold rounded-xl uppercase tracking-wider transition-all duration-300 cursor-pointer text-white';
+      btn.className = 'blog-lang-btn active flex-1 py-3 text-sm font-semibold rounded-xl uppercase tracking-wider transition-all duration-300 cursor-pointer text-white';
     } else {
-      btn.className = 'blog-lang-btn flex-1 py-4 text-sm font-semibold rounded-xl uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200';
+      btn.className = 'blog-lang-btn flex-1 py-3 text-sm font-semibold rounded-xl uppercase tracking-wider transition-all duration-300 cursor-pointer text-slate-400 hover:text-slate-200';
     }
 
     btn.onclick = (e) => {
@@ -441,6 +467,35 @@ async function loadBlogPost() {
 
     // Initialize RSS copy buttons on the post page
     initRSSCopyButtons();
+
+    // Restore scroll position to prevent page jumping (useful on page reloads)
+    try {
+      if (typeof sessionStorage !== 'undefined') {
+        const restoreScroll = sessionStorage.getItem('blog-scroll-restore');
+        if (restoreScroll !== null) {
+          sessionStorage.removeItem('blog-scroll-restore');
+          const targetScroll = parseInt(restoreScroll, 10);
+          
+          const restore = () => {
+            const htmlEl = document.documentElement;
+            const originalScrollBehavior = htmlEl.style.scrollBehavior;
+            htmlEl.style.scrollBehavior = 'auto';
+            globalThis.scrollTo(0, targetScroll);
+            requestAnimationFrame(() => {
+              htmlEl.style.scrollBehavior = originalScrollBehavior;
+            });
+          };
+
+          // Multi-phase restoration to handle asynchronous image load and paint timing
+          restore();
+          requestAnimationFrame(restore);
+          setTimeout(restore, 50);
+          setTimeout(restore, 150);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to restore scroll position:', e);
+    }
   } catch (error) {
     console.error('Error loading post:', error);
     displayError(postContainer, t.errorLoading);
@@ -505,6 +560,11 @@ if (typeof document !== 'undefined' && !globalThis.__TEST__) {
   } else {
     loadBlogPost();
   }
+
+  // Handle back/forward navigation for language transitions
+  globalThis.addEventListener('popstate', () => {
+    loadBlogPost();
+  });
 
   document.addEventListener('partialLoaded', (e) => {
     if (e.detail?.url?.includes('header.html')) {

@@ -1159,10 +1159,6 @@ video {
      object-fit: cover;
 }
 
-.p-0 {
-  padding: 0px;
-}
-
 .p-1 {
   padding: 0.25rem;
 }
@@ -1213,6 +1209,11 @@ video {
 .py-20 {
   padding-top: 5rem;
   padding-bottom: 5rem;
+}
+
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
 }
 
 .py-4 {

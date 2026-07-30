@@ -64,7 +64,7 @@
         if (url.includes('partials/')) {
           url = '/partials/' + url.substring(url.indexOf('partials/') + 9);
         }
-        const content = await fetchPartial(url);
+        const content = await fetchPartial(url + '?v=' + new Date().getTime());
         if (content) {
           const sanitized = localSanitizeHTML(content);
           el.replaceChildren(...Array.from(sanitized.childNodes));

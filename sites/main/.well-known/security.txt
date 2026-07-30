@@ -1,0 +1,4 @@
+Contact: mailto:contact@tanhio.dev
+Expires: 2027-01-01T00:00:00.000Z
+Preferred-Languages: en, ru, pl
+Canonical: https://tanhio.dev/.well-known/security.txt

@@ -512,3 +512,13 @@ header .brand-avatar {
 .blog-rss-module .bi-rss-fill {
   color: inherit !important;
 }
+
+/* Mobile menu language switcher matching CV button */
+#mobile-lang-switcher-container .blog-lang-pill {
+  padding: 4px !important;
+}
+
+#mobile-lang-switcher-container .blog-lang-btn {
+  padding-top: 11px !important;
+  padding-bottom: 11px !important;
+}

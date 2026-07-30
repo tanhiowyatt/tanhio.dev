@@ -75,6 +75,36 @@ const mainApp = sites['main'];
 
 // --- MAIN SERVER CONFIG ---
 
+// Security headers (Helmet)
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "https://unpkg.com"],
+      styleSrc: ["'self'", "https://unpkg.com"],
+      fontSrc: ["'self'", "data:"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://vitals.vercel-insights.com"],
+      frameAncestors: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      upgradeInsecureRequests: null
+    }
+  },
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+// Additional security headers
+app.use((req, res, next) => {
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  next();
+});
+
 // Parse cookies and JSON bodies
 app.use(cookieParser());
 app.use(express.json());
@@ -138,35 +168,7 @@ if (sites['blog']) {
   });
 }
 
-// Security headers (Helmet)
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "https://unpkg.com"],
-      styleSrc: ["'self'", "https://unpkg.com"],
-      fontSrc: ["'self'", "data:"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://vitals.vercel-insights.com"],
-      frameAncestors: ["'none'"],
-      baseUri: ["'self'"],
-      formAction: ["'self'"],
-      upgradeInsecureRequests: null
-    }
-  },
-  crossOriginEmbedderPolicy: false,
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
 
-// Additional security headers
-app.use((req, res, next) => {
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-  next();
-});
 
 // CSRF protection middleware
 app.use((req, res, next) => {

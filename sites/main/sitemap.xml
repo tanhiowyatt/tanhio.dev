@@ -6,6 +6,11 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://tanhio.dev/cv</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://tanhio.dev/crypto.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -19,6 +24,104 @@
     <loc>https://tanhio.dev/term_of_service.html</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
+  </url>
+
+  <!-- Blog main pages -->
+  <url>
+    <loc>https://tanhio.dev/blog/en</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/ru</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/pl</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blog posts (EN) -->
+  <url>
+    <loc>https://tanhio.dev/blog/en/dogs-and-govs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/en/icann</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/en/industrial-ussr</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/en/runet-blocks</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/en/thum</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog posts (RU) -->
+  <url>
+    <loc>https://tanhio.dev/blog/ru/dogs-and-govs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/ru/icann</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/ru/industrial-ussr</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/ru/runet-blocks</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/ru/thum</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Blog posts (PL) -->
+  <url>
+    <loc>https://tanhio.dev/blog/pl/dogs-and-govs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/pl/icann</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/pl/industrial-ussr</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/pl/runet-blocks</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://tanhio.dev/blog/pl/thum</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>
 
