@@ -21,3 +21,15 @@
   margin-right: 0;
   display: block;
 }
+
+@media (max-width: 768px) {
+  .policy-body,
+  .policy-body p:not(.last-updated),
+  .policy-body ul,
+  .policy-body ol {
+    text-align: left;
+    text-justify: auto;
+    hyphens: manual;
+    -webkit-hyphens: manual;
+  }
+}
