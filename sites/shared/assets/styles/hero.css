@@ -55,6 +55,7 @@
 .hero-copy-box {
   max-height: var(--portrait-h, auto);
   overflow: visible;
+  overflow-anchor: none;
 }
 
 .hero-disclaimer {

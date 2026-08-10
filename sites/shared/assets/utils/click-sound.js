@@ -35,36 +35,49 @@ function isClickableTarget(target) {
 }
 
 function playClickSound(callback) {
+  let callbackCalled = false;
+  const triggerCallback = () => {
+    if (callback && !callbackCalled) {
+      callbackCalled = true;
+      callback();
+    }
+  };
+
   if (!shouldPlay()) {
-    if (callback) callback();
+    triggerCallback();
     return;
   }
   const a = ensureAudio();
   if (!a) {
-    if (callback) callback();
+    triggerCallback();
     return;
+  }
+
+  // Navigate after a standard tactile sound feedback delay (120ms),
+  // ensuring we never freeze navigation if the network queue is busy.
+  if (callback) {
+    setTimeout(triggerCallback, 120);
   }
 
   try {
     a.currentTime = 0;
     const playPromise = a.play();
     if (playPromise && typeof playPromise.then === 'function') {
-      playPromise.then(function() {
-        if (callback) callback();
-      }).catch(function () {
-        if (callback) callback();
-      });
-    } else if (callback) {
-      setTimeout(callback, 10);
+      playPromise.then(triggerCallback).catch(triggerCallback);
+    } else {
+      triggerCallback();
     }
   } catch (e) {
     console.warn('[click-sound] play error:', e);
-    if (callback) callback();
+    triggerCallback();
   }
 }
 
 function init() {
   if (typeof document !== 'undefined') {
+    // Pre-initialize and load the audio asset early
+    ensureAudio();
+
     document.addEventListener(
       'click',
       function (event) {

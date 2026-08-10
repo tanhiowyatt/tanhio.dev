@@ -24,7 +24,7 @@
 
   <!-- Content Security Policy -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' https://unpkg.com; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://unpkg.com https://vitals.vercel-insights.com; base-uri 'self'; form-action 'self';">
+    content="default-src 'self'; script-src 'self' https://unpkg.com/leaflet@1.9.4/dist/leaflet.js; style-src 'self' https://unpkg.com/leaflet@1.9.4/dist/leaflet.css; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://unpkg.com/leaflet@1.9.4/dist/leaflet.js.map https://vitals.vercel-insights.com; base-uri 'self'; form-action 'self';">
 
   <meta name="title" content="404 — Page Not Found">
   <meta name="description" content="The page you are looking for does not exist.">
@@ -55,7 +55,7 @@
 
 <body class="error-page">
   <!-- Header include -->
-  <div data-include="/partials/header.html?v=3"></div>
+  <div data-include="partials/header.html"></div>
 
   <!-- Main content wrapper -->
   <main class="error-wrapper">

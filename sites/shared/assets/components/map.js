@@ -48,10 +48,21 @@
         const pointUp = L.point(point.x, point.y - 5);
         const shifted = map.layerPointToLatLng(pointUp);
 
+        // Outer white base circle
         L.circleMarker(shifted, {
-          radius: 5,
-          color: '#ffffff',
+          radius: 7,
+          stroke: false,
           fillColor: '#ffffff',
+          fillOpacity: 1,
+          interactive: false,
+          bubblingMouseEvents: false
+        }).addTo(map);
+
+        // Inner blue circle
+        L.circleMarker(shifted, {
+          radius: 3.5,
+          stroke: false,
+          fillColor: '#007aff',
           fillOpacity: 1,
           interactive: false,
           bubblingMouseEvents: false

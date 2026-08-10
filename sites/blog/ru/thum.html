@@ -7,8 +7,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <!-- Preload Critical Fonts, Connections & Partials -->
-  <link rel="preload" href="/assets/vendor/fonts/opensans-400-latin.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="preload" href="/assets/vendor/fonts/opensans-700-latin.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/vendor/fonts/opensans-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/assets/vendor/fonts/opensans-700-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/partials/header.html" as="fetch" crossorigin />
   <link rel="preload" href="/partials/footer.html" as="fetch" crossorigin />
   <link rel="preconnect" href="https://a.basemaps.cartocdn.com" crossorigin />
@@ -26,7 +26,7 @@
 
   <!-- Content Security Policy -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' https://unpkg.com; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://unpkg.com https://vitals.vercel-insights.com; base-uri 'self'; form-action 'self';">
+    content="default-src 'self'; script-src 'self' https://unpkg.com/leaflet@1.9.4/dist/leaflet.js; style-src 'self' https://unpkg.com/leaflet@1.9.4/dist/leaflet.css; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self' https://unpkg.com/leaflet@1.9.4/dist/leaflet.js.map https://vitals.vercel-insights.com; base-uri 'self'; form-action 'self';">
 
             <link rel="canonical" href="/blog/ru/thum">
 

@@ -100,11 +100,11 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "https://unpkg.com"],
-      styleSrc: ["'self'", "https://unpkg.com"],
+      scriptSrc: ["'self'", "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"],
+      styleSrc: ["'self'", "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"],
       fontSrc: ["'self'", "data:"],
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://unpkg.com", "https://vitals.vercel-insights.com"],
+      connectSrc: ["'self'", "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js.map", "https://vitals.vercel-insights.com"],
       frameAncestors: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
