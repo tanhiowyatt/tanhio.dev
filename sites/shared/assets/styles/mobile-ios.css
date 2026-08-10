@@ -25,10 +25,13 @@
     pointer-events: none;                     /* doesn't block taps */
   }
 
-  body, body.loaded {
+  body {
     background-color: #111110; /* duplicate background on body */
-    opacity: 1 !important;     /* no fade-in — otherwise chrome bleeds through on load */
-    animation: none !important;  /* disable fadeIn on iOS */
+  }
+
+  body.loaded {
+    opacity: 1 !important;
+    animation: none !important;
   }
 
   body.fade-out {
