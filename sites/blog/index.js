@@ -121,8 +121,12 @@ function determineCoverImage(frontmatter, content, targetLang, dir, BASE) {
   const mdxImage = extractFirstImage(content, targetLang, dir);
   if (mdxImage) return mdxImage;
 
-  const fallbackPath = path.join(blogPath, targetLang, 'posts', dir, `${dir}.png`);
-  if (fs.existsSync(fallbackPath)) {
+  const fallbackWebP = path.join(blogPath, targetLang, 'posts', dir, `${dir}.webp`);
+  if (fs.existsSync(fallbackWebP)) {
+    return `${BASE}/blog/${targetLang}/posts/${dir}/${dir}.webp`;
+  }
+  const fallbackPNG = path.join(blogPath, targetLang, 'posts', dir, `${dir}.png`);
+  if (fs.existsSync(fallbackPNG)) {
     return `${BASE}/blog/${targetLang}/posts/${dir}/${dir}.png`;
   }
 
