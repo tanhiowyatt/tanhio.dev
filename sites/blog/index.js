@@ -99,9 +99,9 @@ function mdToHtml(md, lang, slug, coverImage) {
       }
       return `<img src="${absoluteSrc}" alt="${escapeXML(alt)}" />`;
     })
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
-    .replace(/(<li>.*<\/li>\n?)+/g, s => `<ul>${s}</ul>`)
+    .replace(/\[([^\]\r\n]+)\]\(([^)\s\r\n]+)\)/g, '<a href="$2">$1</a>')
+    .replace(/^[-*] ([^\r\n]+)/gm, '<li>$1</li>')
+    .replace(/((?:<li>[^\r\n]*?<\/li>(?:\r?\n)?)+)/g, s => `<ul>${s}</ul>`)
     .split(/\n{2,}/)
     .map(p => {
       p = p.trim();

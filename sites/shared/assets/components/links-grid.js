@@ -94,10 +94,10 @@ function init() {
 }
 
 if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
+  if (document.readyState === 'complete') {
     init();
+  } else {
+    globalThis.addEventListener('load', init);
   }
 }
 

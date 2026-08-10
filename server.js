@@ -16,6 +16,15 @@ if (!process.env.VERCEL) {
     res.setHeader('Expires', '0');
     next();
   });
+} else {
+  // Enable edge caching on Vercel production for all static pages, assets, and images
+  app.use((req, res, next) => {
+    const cleanPath = req.path.replace(/\/+$/, ''); // trim trailing slashes
+    if (cleanPath !== '/api' && !cleanPath.startsWith('/api/')) {
+      res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=86400, stale-while-revalidate=60');
+    }
+    next();
+  });
 }
 
 // Initialize CSRF protection
@@ -54,8 +63,9 @@ fs.readdirSync(sitesDir).forEach(dir => {
       // Redirect index requests to root
       staticRouter.get('/index', (req, res) => res.redirect(301, '/'));
       
-      // Special handling for api 404s on the main site
+      // Special handling for api 404s and legal redirects on the main site
       if (dir === 'main') {
+        staticRouter.get(['/term_of_service', '/term_of_service.html'], (req, res) => res.redirect(301, '/terms_of_service'));
         staticRouter.use('/api', (req, res) => res.status(404).json({ error: 'API endpoint not found' }));
       }
       
@@ -116,24 +126,33 @@ app.use((req, res, next) => {
     const query = req.url.slice(req.path.length);
     const cleanPath = req.path.slice(0, -1);
     
-    // Prevent Open Redirect (jssecurity:S5146)
-    // Ensure the redirect target is a safe relative path starting with a single '/'
+    // Construct the redirect target path
     let target = cleanPath + query;
-    if (target.includes('://') || target.startsWith('//') || target.startsWith('\\')) {
-      target = '/' + target.replace(/^([a-zA-Z0-9+-.]+:\/\/[^\/]+)?[\/\\]+/, '');
-    }
     
-    res.redirect(301, target);
+    // Strictly sanitize and validate the target path to ensure it is relative
+    // Prevent Open Redirect (jssecurity:S5146)
+    target = '/' + target.replace(/^[\\/]+/g, '');
+    
+    if (target.startsWith('/') && !target.startsWith('//') && !target.startsWith('\\') && !target.includes('://')) {
+      res.redirect(301, target);
+    } else {
+      res.redirect(301, '/');
+    }
   } else {
     next();
   }
 });
 
 // Shared static assets for ALL subdomains & sites
-app.use('/assets', express.static(path.join(__dirname, './sites/shared/assets')));
-app.use('/partials', express.static(path.join(__dirname, './sites/shared/partials')));
-app.use('/pics', express.static(path.join(__dirname, './sites/shared/pics')));
-app.use('/files', express.static(path.join(__dirname, './sites/shared/files')));
+const staticOptions = {
+  setHeaders: (res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+};
+app.use('/assets', express.static(path.join(__dirname, './sites/shared/assets'), staticOptions));
+app.use('/partials', express.static(path.join(__dirname, './sites/shared/partials'), staticOptions));
+app.use('/pics', express.static(path.join(__dirname, './sites/shared/pics'), staticOptions));
+app.use('/files', express.static(path.join(__dirname, './sites/shared/files'), staticOptions));
 
 // Serve root-level favicons & apple-touch-icons (required for RSS readers and web browsers)
 app.get('/favicon.ico', (req, res) => {
@@ -220,63 +239,73 @@ app.get('/api/csrf-token', (req, res, next) => {
   res.json({ csrfToken: token });
 });
 
+function getSubdomainInfo(host, prodDomain) {
+  const cleanHost = host.split(':')[0].toLowerCase();
+  const rawPort = host.split(':')[1] || '';
+  const port = /^\d+$/.test(rawPort) ? `:${rawPort}` : '';
+
+  if (cleanHost.endsWith(`.${prodDomain}`)) {
+    return {
+      subdomain: cleanHost.slice(0, -(prodDomain.length + 1)),
+      targetHost: `${prodDomain}${port}`
+    };
+  }
+  
+  if (cleanHost.endsWith('.localhost')) {
+    return {
+      subdomain: cleanHost.slice(0, -('.localhost'.length)),
+      targetHost: `localhost${port}`
+    };
+  }
+
+  return { subdomain: null, targetHost: null };
+}
+
+function handleSubdomainRedirect(req, res, subdomain, targetHost, host) {
+  const referer = req.headers.referer || '';
+  const isNavigatingFromSubdomain = referer.includes(`://${subdomain}.`);
+
+  if (!isNavigatingFromSubdomain || !targetHost || targetHost === host) {
+    return false;
+  }
+
+  const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+  let redirectPath = '/';
+  try {
+    const parsedUrl = new URL(req.originalUrl, 'https://safe-fallback.internal');
+    redirectPath = parsedUrl.pathname + parsedUrl.search;
+  } catch (e) {
+    console.error('URL parsing failed for redirect:', e.message);
+  }
+  
+  if (subdomain === 'blog') {
+    redirectPath = `/blog${redirectPath}`;
+  }
+  
+  const redirectUrl = `${protocol}://${targetHost}${redirectPath}`;
+  const isTrustedRedirect = redirectUrl.startsWith('https://tanhio.dev') || 
+                            redirectUrl.startsWith('http://localhost') || 
+                            redirectUrl.startsWith('https://localhost');
+                            
+  res.redirect(301, isTrustedRedirect ? redirectUrl : '/');
+  return true;
+}
+
 // --- DYNAMIC HOST ROUTING ---
 app.use((req, res, next) => {
   const host = req.headers.host || '';
-  const cleanHost = host.split(':')[0].toLowerCase();
-  
   const prodDomain = 'tanhio.dev';
-  
-  // Extract subdomain if matching the domain format
-  let subdomain = null;
-  let targetHost = null;
-  const port = host.split(':')[1] ? `:${host.split(':')[1]}` : '';
+  const { subdomain, targetHost } = getSubdomainInfo(host, prodDomain);
 
-  if (cleanHost.endsWith(`.${prodDomain}`)) {
-    subdomain = cleanHost.slice(0, -(prodDomain.length + 1));
-    targetHost = `${prodDomain}${port}`;
-  } else if (cleanHost.endsWith('.localhost')) {
-    subdomain = cleanHost.slice(0, -('.localhost'.length));
-    targetHost = `localhost${port}`;
-  }
-  
-
-  // Route to the corresponding subdomain site if it exists (excluding www and blog)
   if (subdomain && subdomain !== 'www') {
     if (subdomain !== 'blog' && sites[subdomain]) {
       return sites[subdomain](req, res, next);
     }
     
-    // For unknown subdomains:
-    // If they are trying to navigate from within the subdomain (e.g. clicking a link on the 404 page),
-    // redirect them to the main domain. Otherwise, serve a 404 page.
-    const referer = req.headers.referer || '';
-    const isNavigatingFromSubdomain = referer.includes(`://${subdomain}.`);
-
-    if (isNavigatingFromSubdomain) {
-      if (targetHost && targetHost !== host) {
-        const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-        
-        // Safely extract only pathname and search query to prevent Open Redirect
-        let redirectPath = '/';
-        try {
-          const parsedUrl = new URL(req.originalUrl, 'http://safe-fallback.internal');
-          redirectPath = parsedUrl.pathname + parsedUrl.search;
-        } catch (e) {
-          // Fallback to root
-        }
-        
-        // Special handling: redirect blog subdomain to the /blog subpath
-        if (subdomain === 'blog') {
-          redirectPath = `/blog${redirectPath}`;
-        }
-        
-        // nosemgrep: javascript.express.security.audit.possible-user-input-redirect.unknown-value-in-redirect
-        return res.redirect(301, `${protocol}://${targetHost}${redirectPath}`);
-      }
+    if (handleSubdomainRedirect(req, res, subdomain, targetHost, host)) {
+      return;
     }
 
-    // Fallback 404 if not navigating from within the subdomain
     res.status(404);
     const fallback404 = path.join(sitesDir, 'main/404.html');
     if (fs.existsSync(fallback404)) {
@@ -285,7 +314,6 @@ app.use((req, res, next) => {
     return res.send('404 Not Found');
   }
   
-  // Default fallback (tanhio.dev, www.tanhio.dev, localhost, etc.)
   return mainApp(req, res, next);
 });
 

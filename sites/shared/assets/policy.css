@@ -14,5 +14,10 @@
   text-align: justify;
   text-justify: inter-word;
 }
-
-
+.policy-body p.last-updated {
+  text-align: right;
+  width: auto;
+  margin-left: auto;
+  margin-right: 0;
+  display: block;
+}

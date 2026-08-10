@@ -170,3 +170,14 @@
     font-size: 9px;
   }
 }
+
+/* Page specific overrides */
+html.tools-page {
+  --tile: 240px;
+}
+
+@media (max-width: 768px) {
+  html.tools-page {
+    --tile: 160px;
+  }
+}

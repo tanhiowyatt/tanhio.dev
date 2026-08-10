@@ -81,14 +81,14 @@ function markdownToHTML(markdown) {
   });
     
   // Links
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/gim, '<a href="$2">$1</a>');
+  html = html.replace(/\[([^\]\r\n]+)\]\(([^)\s\r\n]+)\)/gim, '<a href="$2">$1</a>');
     
   // Blockquotes - support both > and &gt;
   html = html.replace(/^(>|&gt;)\s?([^\r\n]*)$/gim, '<blockquote>$2</blockquote>');
     
   // Lists
-  html = html.replace(/^\s*-\s+([^\r\n]+)/gim, '<li>$1</li>')
-             .replace(/^\s*\d\.\s+([^\r\n]+)/gim, '<li>$1</li>');
+  html = html.replace(/^[ \t]*-[ \t]+([^\r\n]+)/gim, '<li>$1</li>')
+             .replace(/^[ \t]*\d\.[ \t]+([^\r\n]+)/gim, '<li>$1</li>');
     
   // Code blocks
   html = html.replace(/```([\s\S]*?)```/gim, '<pre><code>$1</code></pre>')
@@ -221,6 +221,15 @@ function setBlogLanguage(lang) {
   }
 }
 
+function cleanLanguagePath(path, isSubpath) {
+  let cleanPath = isSubpath ? path.substring('/blog'.length) : path;
+  const langMatch = cleanPath.match(/^\/(ru|pl|en)(\/|$)/);
+  if (langMatch) {
+    cleanPath = '/' + cleanPath.substring(langMatch[0].length);
+  }
+  return cleanPath;
+}
+
 function navigateToLanguage(targetLang) {
   if (typeof globalThis === 'undefined' || !globalThis.location) return;
   
@@ -233,35 +242,11 @@ function navigateToLanguage(targetLang) {
   const isSubpath = path.startsWith('/blog');
   const base = isSubpath ? '/blog' : '';
   
-  let cleanPath = path;
-  if (isSubpath) {
-    cleanPath = path.substring('/blog'.length);
-  }
+  const cleanPath = cleanLanguagePath(path, isSubpath);
   
-  if (cleanPath.startsWith('/ru/')) {
-    cleanPath = cleanPath.substring('/ru'.length);
-  } else if (cleanPath === '/ru') {
-    cleanPath = '/';
-  } else if (cleanPath.startsWith('/pl/')) {
-    cleanPath = cleanPath.substring('/pl'.length);
-  } else if (cleanPath === '/pl') {
-    cleanPath = '/';
-  } else if (cleanPath.startsWith('/en/')) {
-    cleanPath = cleanPath.substring('/en'.length);
-  } else if (cleanPath === '/en') {
-    cleanPath = '/';
-  }
-  
-  let newPath = '';
-  if (targetLang === 'ru') {
-    newPath = base + '/ru' + cleanPath;
-  } else if (targetLang === 'pl') {
-    newPath = base + '/pl' + cleanPath;
-  } else if (targetLang === 'en') {
-    newPath = base + '/en' + cleanPath;
-  } else {
-    newPath = base + cleanPath;
-  }
+  let newPath = ['ru', 'pl', 'en'].includes(targetLang)
+    ? `${base}/${targetLang}${cleanPath}`
+    : `${base}${cleanPath}`;
   
   newPath = newPath.replace(/\/+/g, '/');
   if (newPath === '') newPath = '/';
@@ -474,7 +459,7 @@ async function loadBlogPost() {
         const restoreScroll = sessionStorage.getItem('blog-scroll-restore');
         if (restoreScroll !== null) {
           sessionStorage.removeItem('blog-scroll-restore');
-          const targetScroll = parseInt(restoreScroll, 10);
+          const targetScroll = Number.parseInt(restoreScroll, 10);
           
           const restore = () => {
             const htmlEl = document.documentElement;

@@ -4,6 +4,20 @@
   function loadVercelAnalytics() {
     if (document.querySelector(`script[src="/_vercel/insights/script.js"]`)) return;
 
+    const isTest = typeof globalThis !== 'undefined' && (globalThis.__TEST__ || typeof jest !== 'undefined');
+    const isLocal = typeof location !== 'undefined' && 
+      (location.hostname === 'localhost' || 
+       location.hostname === '127.0.0.1' || 
+       location.hostname === '[::1]' || 
+       location.hostname.startsWith('192.168.') || 
+       location.hostname.startsWith('10.') || 
+       location.hostname.endsWith('.local'));
+
+    if (isLocal && !isTest) {
+      console.log('Vercel Analytics: Bypassed loading analytics scripts in local environment.');
+      return;
+    }
+
     globalThis.va = globalThis.va || function () { globalThis.vaq = globalThis.vaq || []; globalThis.vaq.push(arguments); };
     const vaScript = document.createElement('script');
     vaScript.defer = true;
@@ -64,10 +78,12 @@
         if (url.includes('partials/')) {
           url = '/partials/' + url.substring(url.indexOf('partials/') + 9);
         }
-        const content = await fetchPartial(url + '?v=' + new Date().getTime());
+        // Use the URL from data-include directly to leverage browser/CDN caching and avoid malformed query strings
+        const content = await fetchPartial(url);
         if (content) {
           const sanitized = localSanitizeHTML(content);
           el.replaceChildren(...Array.from(sanitized.childNodes));
+          el.setAttribute('data-loaded', 'true');
 
           const event = new CustomEvent('partialLoaded', {
             detail: { url, element: el },
@@ -93,12 +109,12 @@
     }
 
     const consentHTML = `
-      <div id="cookie-consent-banner" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] md:w-full md:max-w-xl z-50 p-6 md:p-8 rounded-3xl border border-white/10 shadow-2xl flex flex-col gap-5 transition-all duration-500 transform translate-y-12 opacity-0 select-none" style="background-color: #090908;">
+      <div id="cookie-consent-banner" role="region" aria-labelledby="cookie-consent-title" aria-describedby="cookie-consent-description" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] md:w-full md:max-w-xl z-50 p-6 md:p-8 rounded-3xl border border-white/10 shadow-2xl flex flex-col gap-5 transition-all duration-500 transform translate-y-12 opacity-0 select-none">
         <div class="flex items-center gap-2">
-          <span class="text-xl">🍪</span>
-          <h4 class="text-lg font-bold text-white tracking-tight">Cookie Consent</h4>
+          <span class="text-xl" aria-hidden="true">🍪</span>
+          <h4 id="cookie-consent-title" class="text-lg font-bold text-white tracking-tight">Cookie Consent</h4>
         </div>
-        <p class="text-xs md:text-sm text-[#bcbcbc] leading-relaxed font-normal">
+        <p id="cookie-consent-description" class="text-xs md:text-sm text-[#bcbcbc] leading-relaxed font-normal">
           Cookies are essential to provide the full experience. Read how we manage cookies in our Privacy Policy, or accept all cookies to continue using the website.
         </p>
         <div class="flex items-center gap-3 mt-1 w-full">
@@ -161,11 +177,11 @@
         document.body.classList.add('loaded');
       }
 
-      // General fallback: Force page visibility after 150ms on slow connections / undetected crawlers
+      // General fallback: Force page visibility after 1000ms on slow connections / undetected crawlers
       const visibilityTimeout = setTimeout(() => {
         document.documentElement.classList.remove('js-loading');
         document.body.classList.add('loaded');
-      }, 150);
+      }, 1000);
 
       try {
         await loadIncludes();

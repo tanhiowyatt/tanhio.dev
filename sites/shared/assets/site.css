@@ -171,3 +171,17 @@ header {
     transform: scale(1);
   }
 }
+
+/* --- Include Placeholders & Sticky fixes --- */
+
+/* Reserve vertical space for the header during page load to avoid layout shift (CLS) */
+div[data-include*="header.html"]:not([data-loaded="true"]) {
+  display: block;
+  min-height: 58px;
+}
+
+@media (max-width: 768px) {
+  div[data-include*="header.html"]:not([data-loaded="true"]) {
+    min-height: 48px;
+  }
+}

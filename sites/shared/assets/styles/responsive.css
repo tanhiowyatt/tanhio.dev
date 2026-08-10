@@ -101,7 +101,7 @@
     gap: 1rem !important;                  /* reduced gap between items */
   }
 
-  #experience li {
+  #experience ul.divide-y li {
     padding-top: 1.5rem !important;    /* vertical padding for list items */
     padding-bottom: 1.5rem !important; /* symmetrical bottom padding */
   }

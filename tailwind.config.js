@@ -6,7 +6,11 @@ module.exports = {
     "./sites/**/*.js",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ["'Open Sans'", 'system-ui', '-apple-system', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 }

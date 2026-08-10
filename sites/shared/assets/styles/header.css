@@ -5,157 +5,227 @@
 /* --- Nav pill (desktop and mobile) ---------------------------------------- */
 
 .nav-pill {
-    background-color: #090908;              /* opaque tint pill; iOS override in mobile-ios.css */
-    backdrop-filter: blur(10px);            /* glass effect on desktop */
-    -webkit-backdrop-filter: blur(10px);    /* webkit prefix */
-    border: 1px solid rgba(255, 255, 255, .1); /* thin light border */
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); /* light shadow under pill */
-    transition: none;                       /* no background animation — prevents flickering */
+    background-color: #090908;
+    /* opaque tint pill; iOS override in mobile-ios.css */
+    backdrop-filter: blur(10px);
+    /* glass effect on desktop */
+    -webkit-backdrop-filter: blur(10px);
+    /* webkit prefix */
+    border: 1px solid rgba(255, 255, 255, .1);
+    /* thin light border */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    /* light shadow under pill */
+    transition: none;
+    /* no background animation — prevents flickering */
 }
 
 .brand-avatar {
-    width: 20px;           /* logo size in header */
-    height: 20px;          /* square avatar */
-    display: block;        /* remove inline gap below img */
-    object-fit: contain;   /* svg/logo fits without cropping */
+    width: 20px;
+    /* logo size in header */
+    height: 20px;
+    /* square avatar */
+    display: block;
+    /* remove inline gap below img */
+    object-fit: contain;
+    /* svg/logo fits without cropping */
 }
 
 /* --- Dropdown (desktop) ---------------------------------------------------- */
 
 .dropdown-menu {
-    perspective: 1000px; /* 3D perspective for dropdown animation */
+    perspective: 1000px;
+    /* 3D perspective for dropdown animation */
 }
 
 .dropdown-content {
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5); /* dropdown panel shadow */
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    /* dropdown panel shadow */
 }
 
 .dropdown-icon-wrapper {
-    transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease); /* icon hover animation */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* icon border in dropdown */
+    transition: background-color 0.3s var(--ease), border-color 0.3s var(--ease);
+    /* icon hover animation */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* icon border in dropdown */
 }
 
 .dropdown-item i {
-    font-size: 16px;                                              /* bootstrap icon size */
-    transition: color 0.3s var(--ease), opacity 0.3s var(--ease); /* hover animation */
+    font-size: 16px;
+    /* bootstrap icon size */
+    transition: color 0.3s var(--ease), opacity 0.3s var(--ease);
+    /* hover animation */
 }
 
 .dropdown-item:hover .dropdown-icon-wrapper {
-    background: rgba(255, 255, 255, 0.1);  /* icon background highlight on hover */
-    border-color: rgba(255, 255, 255, 0.3); /* brighter border on hover */
+    background: rgba(255, 255, 255, 0.1);
+    /* icon background highlight on hover */
+    border-color: rgba(255, 255, 255, 0.3);
+    /* brighter border on hover */
 }
 
 .dropdown-item:hover .dropdown-icon-wrapper i {
-    color: white;  /* icon turns white on hover */
-    opacity: 1;    /* full opacity */
+    color: white;
+    /* icon turns white on hover */
+    opacity: 1;
+    /* full opacity */
 }
 
 .dropdown-item:hover span {
-    color: white; /* item text turns white on hover */
+    color: white;
+    /* item text turns white on hover */
 }
 
 /* --- Mobile accordion (inside .mobile-menu) -------------------------------- */
 
 .mobile-accordion-content {
-    overflow: hidden;                                      /* hide content when collapsed */
-    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* smooth accordion open */
+    overflow: hidden;
+    /* hide content when collapsed */
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* smooth accordion open */
 }
 
 .mobile-accordion-trigger[aria-expanded="true"]+.mobile-accordion-content {
-    max-height: 500px; /* sufficient height for expanded block */
+    max-height: 500px;
+    /* sufficient height for expanded block */
 }
 
 /* --- Mobile menu overlay --------------------------------------------------- */
 
 .mobile-menu {
-    position: fixed;  /* above all content */
-    inset: 0;         /* top/right/bottom/left: 0 */
-    z-index: 1000;    /* above header (z-40) and content */
+    position: fixed;
+    /* above all content */
+    inset: 0;
+    /* top/right/bottom/left: 0 */
+    z-index: 1000;
+    /* above header (z-40) and content */
 
-    width: 100vw;     /* full viewport width */
-    height: 100vh;    /* fallback height */
-    height: 100dvh;   /* dynamic viewport — correct on iOS with address bar */
+    width: 100vw;
+    /* full viewport width */
+    height: 100vh;
+    /* fallback height */
+    height: 100dvh;
+    /* dynamic viewport — correct on iOS with address bar */
 
-    background-color: #111110; /* solid menu background = site background */
+    background-color: #111110;
+    /* solid menu background = site background */
 
-    padding: 0; /* safe-area is set in mobile-ios.css for iOS */
+    padding: 0;
+    /* safe-area is set in mobile-ios.css for iOS */
 
-    backdrop-filter: blur(40px);         /* blur on desktop when menu is open */
-    -webkit-backdrop-filter: blur(40px); /* webkit prefix */
+    backdrop-filter: blur(40px);
+    /* blur on desktop when menu is open */
+    -webkit-backdrop-filter: blur(40px);
+    /* webkit prefix */
 
-    visibility: hidden;  /* hidden by default */
-    opacity: 0;          /* transparent by default */
-    transform: translateY(-100%); /* off-screen above */
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* open/close animation */
-    pointer-events: none; /* clicks pass through closed menu */
-    display: flex;        /* flex column: content + CV button */
+    visibility: hidden;
+    /* hidden by default */
+    opacity: 0;
+    /* transparent by default */
+    transform: translateY(-100%);
+    /* off-screen above */
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    /* open/close animation */
+    pointer-events: none;
+    /* clicks pass through closed menu */
+    display: flex;
+    /* flex column: content + CV button */
     flex-direction: column;
 }
 
 .mobile-menu .flex-1 {
-    padding-top: env(safe-area-inset-top);    /* desktop/fallback: offset for notch */
-    padding-bottom: env(safe-area-inset-bottom); /* offset above home indicator */
+    padding-top: env(safe-area-inset-top);
+    /* desktop/fallback: offset for notch */
+    padding-bottom: env(safe-area-inset-bottom);
+    /* offset above home indicator */
 }
 
 .mobile-menu.menu-open {
-    visibility: visible;  /* show menu */
-    opacity: 1;           /* fully opaque */
-    transform: translateY(0); /* slide in from top */
-    pointer-events: auto; /* accept clicks */
+    visibility: visible;
+    /* show menu */
+    opacity: 1;
+    /* fully opaque */
+    transform: translateY(0);
+    /* slide in from top */
+    pointer-events: auto;
+    /* accept clicks */
 }
 
 .mobile-menu .overflow-y-auto {
-    scrollbar-width: none;     /* Firefox: hide scrollbar */
-    -ms-overflow-style: none;  /* IE/Edge: hide scrollbar */
+    scrollbar-width: none;
+    /* Firefox: hide scrollbar */
+    -ms-overflow-style: none;
+    /* IE/Edge: hide scrollbar */
 }
 
 .mobile-menu .overflow-y-auto::-webkit-scrollbar {
-    display: none; /* WebKit: hide scrollbar */
+    display: none;
+    /* WebKit: hide scrollbar */
 }
 
 /* --- Burger button --------------------------------------------------------- */
 
 .mobile-menu-button {
-    width: 44px;            /* Apple HIG: min tap target 44×44 */
+    width: 44px;
+    /* Apple HIG: min tap target 44×44 */
     height: 44px;
-    display: flex;          /* center burger icon */
+    display: flex;
+    /* center burger icon */
     align-items: center;
     justify-content: center;
-    background: transparent; /* no background — pill shows through */
-    border: none;           /* remove default button border */
-    color: white;           /* burger bar color */
+    background: transparent;
+    /* no background — pill shows through */
+    border: none;
+    /* remove default button border */
+    color: white;
+    /* burger bar color */
     cursor: pointer;
-    z-index: 1100;          /* above .mobile-menu when closing */
+    z-index: 1100;
+    /* above .mobile-menu when closing */
 }
 
 .burger-bars {
-    width: 24px;                 /* icon width */
-    height: 18px;                /* icon height */
+    width: 24px;
+    /* icon width */
+    height: 18px;
+    /* icon height */
     display: flex;
-    flex-direction: column;      /* bars stacked vertically */
-    justify-content: space-between; /* even gap between bars */
+    flex-direction: column;
+    /* bars stacked vertically */
+    justify-content: space-between;
+    /* even gap between bars */
 }
 
 .burger-bars span {
-    width: 100%;                  /* bar spans full icon width */
-    height: 2px;                  /* bar thickness */
-    background-color: currentColor; /* color inherits from parent (white) */
-    border-radius: 2px;           /* rounded ends */
-    transition: all 0.3s var(--ease); /* animation (for future → X transform) */
+    width: 100%;
+    /* bar spans full icon width */
+    height: 2px;
+    /* bar thickness */
+    background-color: currentColor;
+    /* color inherits from parent (white) */
+    border-radius: 2px;
+    /* rounded ends */
+    transition: all 0.3s var(--ease);
+    /* animation (for future → X transform) */
 }
 
 .mobile-menu-button.active {
-    opacity: 0;           /* hide burger when menu is open */
-    pointer-events: none; /* don't intercept clicks */
+    opacity: 0;
+    /* hide burger when menu is open */
+    pointer-events: none;
+    /* don't intercept clicks */
 }
 
 /* --- Close button (×) ------------------------------------------------------ */
 
 .mobile-menu-close {
-    position: absolute; /* top-right corner of menu */
-    top: 24px;          /* top offset; iOS override in mobile-ios.css */
-    right: 24px;        /* right offset */
-    width: 44px;        /* tap target 44×44 */
+    position: absolute;
+    /* top-right corner of menu */
+    top: 24px;
+    /* top offset; iOS override in mobile-ios.css */
+    right: 24px;
+    /* right offset */
+    width: 44px;
+    /* tap target 44×44 */
     height: 44px;
     display: flex;
     align-items: center;
@@ -163,47 +233,80 @@
     background: transparent;
     border: none;
     color: white;
-    font-size: 24px;    /* × icon size */
+    font-size: 24px;
+    /* × icon size */
     cursor: pointer;
 }
 
 /* --- Stagger animation for menu items -------------------------------------- */
 
 .mobile-menu li {
-    opacity: 0;                        /* hidden before open */
-    transform: translateY(-20px);      /* shifted upward */
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* smooth appear */
+    opacity: 0;
+    /* hidden before open */
+    transform: translateY(-20px);
+    /* shifted upward */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* smooth appear */
 }
 
 .mobile-menu.menu-open li {
-    opacity: 1;               /* visible when menu is open */
-    transform: translateY(0); /* in place */
+    opacity: 1;
+    /* visible when menu is open */
+    transform: translateY(0);
+    /* in place */
 }
 
-.mobile-menu.menu-open li:nth-child(1) { transition-delay: 0.2s;  } /* 1st item delay */
-.mobile-menu.menu-open li:nth-child(2) { transition-delay: 0.25s; } /* 2nd item */
-.mobile-menu.menu-open li:nth-child(3) { transition-delay: 0.3s;  } /* 3rd item */
-.mobile-menu.menu-open li:nth-child(4) { transition-delay: 0.35s; } /* 4th item */
-.mobile-menu.menu-open li:nth-child(5) { transition-delay: 0.4s;  } /* 5th item */
+.mobile-menu.menu-open li:nth-child(1) {
+    transition-delay: 0.2s;
+}
+
+/* 1st item delay */
+.mobile-menu.menu-open li:nth-child(2) {
+    transition-delay: 0.25s;
+}
+
+/* 2nd item */
+.mobile-menu.menu-open li:nth-child(3) {
+    transition-delay: 0.3s;
+}
+
+/* 3rd item */
+.mobile-menu.menu-open li:nth-child(4) {
+    transition-delay: 0.35s;
+}
+
+/* 4th item */
+.mobile-menu.menu-open li:nth-child(5) {
+    transition-delay: 0.4s;
+}
+
+/* 5th item */
 
 /* --- Misc ------------------------------------------------------------------ */
 
 [download="tanhiowyatt_CV.pdf"] {
-    animation: none !important;   /* no animation on CV button */
-    box-shadow: none !important;  /* no shadow */
+    animation: none !important;
+    /* no animation on CV button */
+    box-shadow: none !important;
+    /* no shadow */
 }
 
 .mobile-accordion-content a {
-    color: #ffffff !important;                              /* white link text in accordion */
-    transition: background-color 0.2s var(--ease);          /* hover background */
+    color: #ffffff !important;
+    /* white link text in accordion */
+    transition: background-color 0.2s var(--ease);
+    /* hover background */
 }
 
 .mobile-accordion-content a i {
-    color: #ffffff !important; /* white icons */
-    opacity: 1 !important;     /* full visibility */
+    color: #ffffff !important;
+    /* white icons */
+    opacity: 1 !important;
+    /* full visibility */
 }
 
 .mobile-accordion-content a:active div,
 .mobile-accordion-content a:hover div {
-    background: rgba(255, 255, 255, 0.1) !important; /* row highlight on tap/hover */
+    background: rgba(255, 255, 255, 0.1) !important;
+    /* row highlight on tap/hover */
 }

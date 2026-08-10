@@ -7,7 +7,7 @@
 </div>
 
 <div align="center">
-  <img src="sites/main/pics/tanhio.dev.png" alt="tanhio.dev logo" width="350" height="auto" />
+  <img src="sites/shared/pics/tanhio.dev.png" alt="tanhio.dev logo" width="350" height="auto" />
 </div>
 
 <h3 align="center">
@@ -19,6 +19,10 @@
 ---
 
 This is the source code for [tanhio.dev](https://tanhio.dev) and its surrounding infrastructure. The project has evolved into a fully dockerized multihost environment powered by Node.js (Express), Caddy (for automatic HTTPS and reverse proxy), and Tailwind CSS.
+
+<div align="center">
+  <img src="sites/shared/pics/tanhio-05-08-2026.png" alt="tanhio.dev preview" width="800" height="auto" />
+</div>
 
 ## 🚀 Features
 
