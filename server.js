@@ -94,7 +94,7 @@ app.use(helmet({
       styleSrc: ["'self'", "https://unpkg.com"],
       fontSrc: ["'self'", "data:"],
       imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'", "https://vitals.vercel-insights.com"],
+      connectSrc: ["'self'", "https://unpkg.com", "https://vitals.vercel-insights.com"],
       frameAncestors: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
