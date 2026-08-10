@@ -29,10 +29,7 @@
     background-color: #111110; /* duplicate background on body */
   }
 
-  body.loaded {
-    opacity: 1 !important;
-    animation: none !important;
-  }
+
 
   body.fade-out {
     animation: fadeOut 0.3s var(--ease) forwards; /* keep fade-out on page transitions */

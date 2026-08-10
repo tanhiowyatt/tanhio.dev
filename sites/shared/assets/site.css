@@ -179,9 +179,3 @@ div[data-include*="header.html"] {
   display: block;
   min-height: 76px;
 }
-
-@media (max-width: 768px) {
-  div[data-include*="header.html"] {
-    min-height: 60px;
-  }
-}

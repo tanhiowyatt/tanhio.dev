@@ -91,6 +91,14 @@
 
 /* --- Mobile menu overlay --------------------------------------------------- */
 
+/* Disable transitions on mobile menu during page load to prevent slide-up animation */
+html.js-loading .mobile-menu,
+body:not(.loaded) .mobile-menu,
+html.js-loading .mobile-menu *,
+body:not(.loaded) .mobile-menu * {
+    transition: none !important;
+}
+
 .mobile-menu {
     position: fixed;
     /* above all content */
