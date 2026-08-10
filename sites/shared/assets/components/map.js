@@ -64,10 +64,10 @@
 
 
   function init() {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initMap);
-    } else {
+    if (document.readyState === 'complete') {
       initMap();
+    } else {
+      globalThis.addEventListener('load', initMap);
     }
   }
 

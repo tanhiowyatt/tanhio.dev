@@ -32,12 +32,18 @@
   transform-origin: center center;
 }
 
-.link-card.square {
-  height: var(--tile);
+.link-card.square,
+.link-card.map-card {
+  height: 240px; /* Fallback to prevent collapsed Leaflet container during initialization */
+  height: var(--tile, 240px);
 }
 
-.link-card.map-card {
-  height: var(--tile);
+@media (max-width: 768px) {
+  .link-card.square,
+  .link-card.map-card {
+    height: 160px;
+    height: var(--tile, 160px);
+  }
 }
 
 .link-card:hover {

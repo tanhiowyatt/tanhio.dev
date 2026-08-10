@@ -8,20 +8,30 @@ const csrf = require('csrf');
 const app = express();
 const PORT = process.env.PORT || 5173;
 
-// Disable caching for local development
+// Caching strategy: cache images and fonts permanently, no-cache for pages/code during dev
 if (!process.env.VERCEL) {
   app.use((req, res, next) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
+    const isStaticAsset = /\.(png|jpg|jpeg|webp|svg|ico|gif|woff|woff2)$/i.test(req.path);
+    if (isStaticAsset) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
     next();
   });
 } else {
-  // Enable edge caching on Vercel production for all static pages, assets, and images
+  // Enable edge caching on Vercel production (with immutable browser cache for images/fonts)
   app.use((req, res, next) => {
     const cleanPath = req.path.replace(/\/+$/, ''); // trim trailing slashes
     if (cleanPath !== '/api' && !cleanPath.startsWith('/api/')) {
-      res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=86400, stale-while-revalidate=60');
+      const isStaticAsset = /\.(png|jpg|jpeg|webp|svg|ico|gif|woff|woff2)$/i.test(req.path);
+      if (isStaticAsset) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=86400, stale-while-revalidate=60');
+      }
     }
     next();
   });

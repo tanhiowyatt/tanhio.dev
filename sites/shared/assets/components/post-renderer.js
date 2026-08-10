@@ -450,6 +450,33 @@ async function loadBlogPost() {
       SanitizeHTML.setSafeHTML(postContainer, htmlContent);
     }
 
+    // Setup event listeners for image blur-up loading inside post content
+    postContainer.querySelectorAll('.blog-post-image').forEach(img => {
+      const checkLoaded = () => {
+        if (img.complete && img.naturalWidth > 0) {
+          img.classList.add('loaded');
+          return true;
+        }
+        return false;
+      };
+
+      if (checkLoaded()) return;
+
+      const transitionTimeout = setTimeout(() => {
+        img.classList.add('img-transition');
+      }, 30);
+
+      img.addEventListener('load', () => {
+        clearTimeout(transitionTimeout);
+        img.classList.add('loaded');
+      });
+
+      img.addEventListener('error', () => {
+        clearTimeout(transitionTimeout);
+        img.classList.add('loaded');
+      });
+    });
+
     // Initialize RSS copy buttons on the post page
     initRSSCopyButtons();
 

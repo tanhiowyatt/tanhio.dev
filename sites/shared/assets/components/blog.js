@@ -122,6 +122,7 @@ function createPostCard(post, sanitizeHTML) {
     const safeImage = escapeHtml(post.image);
     imageHtml = `
       <div class="blog-post-image-wrapper">
+        <div class="image-spinner"></div>
         <img src="${safeImage}" alt="${safeTitle}" class="blog-post-image" loading="lazy" />
       </div>
     `;
@@ -404,6 +405,47 @@ function renderFilteredPosts(posts, category, container) {
   } else {
     SanitizeHTML.setSafeHTML(container, htmlString);
   }
+
+  // Setup event listeners for image blur-up loading (detecting cached images to render instantly)
+  container.querySelectorAll('.blog-post-image').forEach(img => {
+    const checkLoaded = () => {
+      if (img.complete && img.naturalWidth > 0) {
+        img.classList.add('loaded');
+        const spinner = img.previousElementSibling;
+        if (spinner && spinner.classList.contains('image-spinner')) {
+          spinner.remove();
+        }
+        return true;
+      }
+      return false;
+    };
+
+    if (checkLoaded()) return;
+
+    // Set transition delay; if image isn't loaded within 30ms, we show blur transition
+    const transitionTimeout = setTimeout(() => {
+      img.classList.add('img-transition');
+    }, 30);
+
+    img.addEventListener('load', () => {
+      clearTimeout(transitionTimeout);
+      img.classList.add('loaded');
+      const spinner = img.previousElementSibling;
+      if (spinner && spinner.classList.contains('image-spinner')) {
+        spinner.classList.add('fade-out');
+        setTimeout(() => spinner.remove(), 300);
+      }
+    });
+
+    img.addEventListener('error', () => {
+      clearTimeout(transitionTimeout);
+      img.classList.add('loaded');
+      const spinner = img.previousElementSibling;
+      if (spinner && spinner.classList.contains('image-spinner')) {
+        spinner.remove();
+      }
+    });
+  });
 
   // Restore scroll position to prevent page jumping (useful on page reloads)
   try {

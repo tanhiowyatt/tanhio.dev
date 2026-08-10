@@ -98,8 +98,11 @@ function scheduleRun() {
 
 function init() {
   if (typeof globalThis !== 'undefined') {
-    globalThis.addEventListener('DOMContentLoaded', Hero.scheduleRun);
-    globalThis.addEventListener('partialLoaded', Hero.scheduleRun);
+    globalThis.addEventListener('partialLoaded', () => {
+      if (document.readyState === 'complete') {
+        Hero.scheduleRun();
+      }
+    });
     globalThis.addEventListener('load', () => {
       if (document.fonts) {
         document.fonts.ready.then(Hero.scheduleRun).catch(Hero.scheduleRun);

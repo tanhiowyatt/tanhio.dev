@@ -175,7 +175,27 @@ header {
 /* --- Include Placeholders & Sticky fixes --- */
 
 /* Reserve vertical space for the header during page load to avoid layout shift (CLS) */
+/* Prevent mobile menu flash on load before header.css is parsed */
+.mobile-menu {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-100%);
+}
+
+/* Reserve vertical space for the header during page load to avoid layout shift (CLS) */
 div[data-include*="header.html"] {
   display: block;
   min-height: 76px;
+}
+
+/* Reserve vertical space for the footer during page load to avoid layout shift (CLS) */
+div[data-include*="footer.html"] {
+  display: block;
+  min-height: 240px;
+}
+
+@media (max-width: 768px) {
+  div[data-include*="footer.html"] {
+    min-height: 420px;
+  }
 }
