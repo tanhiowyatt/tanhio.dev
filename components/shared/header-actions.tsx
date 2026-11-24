@@ -1,0 +1,222 @@
+"use client";
+
+import { Kbd } from "@/components/ui/kbd";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { motion } from "motion/react";
+import { revealOnMount } from "@/lib/motion";
+import dynamic from "next/dynamic";
+import { siteConfig } from "@/config/site";
+import { trackEvent } from "@/lib/analytics";
+import { FaGithub } from "react-icons/fa";
+import { Moon, Search, Sun } from "@/components/shared/site-icons";
+import { useTheme } from "next-themes";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { navigationConfig } from "@/config/navigation";
+import styles from "./site-header.module.css";
+import { LanguageSwitcher } from "@/components/shared/language-switcher";
+
+const SiteCommandPalette = dynamic(
+  () =>
+    import("@/components/shared/site-command-palette").then(
+      (mod) => mod.SiteCommandPalette,
+    ),
+  { ssr: false },
+);
+
+function GitHubNavLink() {
+  const [starCount, setStarCount] = useState<string | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    try {
+      const path = new URL(siteConfig.banner.openSourceUrl).pathname
+        .split("/")
+        .filter(Boolean);
+      const [owner, repo] = path;
+
+      if (!owner || !repo) return;
+
+      const fetchStarCount = async () => {
+        try {
+          const response = await fetch(
+            `https://api.github.com/repos/${owner}/${repo}`,
+            { signal: controller.signal },
+          );
+          if (!response.ok) return;
+
+          const data = (await response.json()) as { stargazers_count?: number };
+          if (typeof data.stargazers_count !== "number") return;
+
+          setStarCount(
+            new Intl.NumberFormat("en", {
+              notation: "compact",
+              maximumFractionDigits: 1,
+            }).format(data.stargazers_count),
+          );
+        } catch {
+          // silently fail to keep UI stable
+        }
+      };
+
+      fetchStarCount();
+    } catch {
+      // silently fail if URL parsing fails
+    }
+
+    return () => controller.abort();
+  }, []);
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Link
+          href={siteConfig.banner.openSourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={navigationConfig.githubLabel}
+          onClick={() => {
+            trackEvent("github_repo_clicked", {
+              repo_url: siteConfig.banner.openSourceUrl,
+              star_count: starCount,
+            });
+          }}
+          className="group flex h-11 shrink-0 items-center rounded-xl text-muted-foreground outline-none hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          <span className="flex h-[28.8px] min-w-[39.6px] items-center justify-center gap-[5.4px] rounded-lg bg-secondary px-[10.8px]">
+            <FaGithub className="size-4 shrink-0" />
+            {starCount !== null && <span className="font-mono text-[10px]">{starCount}</span>}
+          </span>
+        </Link>
+      </TooltipTrigger>
+      <TooltipContent><p>{siteConfig.banner.openSourceTooltip}</p></TooltipContent>
+    </Tooltip>
+  );
+}
+
+export function HeaderActions() {
+  const { setTheme, resolvedTheme } = useTheme();
+  const themeAudioRef = useRef<HTMLAudioElement>(null);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [paletteMounted, setPaletteMounted] = useState(false);
+  const pathname = usePathname();
+  const isBlog = pathname.split("/").some((segment) => segment === "blog");
+
+  const togglePalette = useCallback(() => {
+    setPaletteMounted(true);
+    setPaletteOpen((prev) => !prev);
+  }, []);
+
+  const playThemeAudio = () => {
+    if (themeAudioRef.current) {
+      themeAudioRef.current.currentTime = 0;
+      themeAudioRef.current.play().catch(() => {});
+    }
+  };
+
+  const toggleTheme = useCallback((method: "button" | "shortcut_key" = "button") => {
+    playThemeAudio();
+    const nextTheme = resolvedTheme === "dark" ? "light" : "dark";
+    trackEvent("theme_toggled", {
+      theme: nextTheme,
+      method,
+    });
+    setTheme(nextTheme);
+  }, [resolvedTheme, setTheme]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target as HTMLElement).isContentEditable
+      ) {
+        return;
+      }
+
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        togglePalette();
+        return;
+      }
+
+      if (
+        e.key.toLowerCase() === siteConfig.banner.themeShortcut.toLowerCase()
+      ) {
+        e.preventDefault();
+        toggleTheme("shortcut_key");
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [togglePalette, toggleTheme]);
+
+  useEffect(() => {
+    const themeAudio = themeAudioRef.current;
+    return () => {
+      themeAudio?.pause();
+    };
+  }, []);
+
+  return (
+    <>
+      <motion.div
+        {...revealOnMount({ y: -10 })}
+        className="pointer-events-auto flex shrink-0 items-center gap-2"
+      >
+        {isBlog && <LanguageSwitcher />}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label={navigationConfig.search}
+              onClick={togglePalette}
+              className={`${styles.utility} ${styles.searchUtility} cursor-pointer`}
+            >
+              <span className={styles.utilityFace}><Search className="size-[14.4px]" /></span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="flex items-center gap-1">{navigationConfig.search} <Kbd>Ctrl / ⌘</Kbd> <Kbd>K</Kbd></p>
+          </TooltipContent>
+        </Tooltip>
+        <GitHubNavLink />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label={siteConfig.banner.themeToggleLabel}
+              data-sound-ignore
+              className={`${styles.utility} cursor-pointer`}
+              onClick={() => toggleTheme("button")}
+            >
+              <span className={styles.utilityFace}>
+                <Sun className="size-[14.4px] rotate-0 scale-100 transition-transform duration-300 dark:-rotate-90 dark:scale-0 motion-reduce:transition-none" />
+                <Moon className="absolute size-[14.4px] rotate-90 scale-0 transition-transform duration-300 dark:rotate-0 dark:scale-100 motion-reduce:transition-none" />
+              </span>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{siteConfig.banner.themeTooltip} <Kbd>{siteConfig.banner.themeShortcut}</Kbd></p>
+          </TooltipContent>
+        </Tooltip>
+      </motion.div>
+
+      <audio
+        ref={themeAudioRef}
+        src={siteConfig.banner.switchAudioSrc}
+        preload="none"
+      />
+
+      {paletteMounted && (
+        <SiteCommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} />
+      )}
+    </>
+  );
+}

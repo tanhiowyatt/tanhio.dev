@@ -1,0 +1,636 @@
+# agents.md
+
+> Standing context for this repo. Read it before the first edit, and update it in
+> the same commit whenever a convention changes.
+
+## 1. House rules
+
+Five rules sit above everything else.
+
+1. **UI copy uses sentence case.** Capitalize the first letter of labels,
+   buttons, headings, and empty states. Avoid `ALL-CAPS` shouting. Do not
+   force strings to lowercase. Scope and exceptions in [§11 UI copy](#11-ui-copy).
+2. **No em dashes.** Never use the em dash character (the long dash) in UI copy or documentation. Rewrite with a comma, colon, or period instead.
+3. **One border per edge.** Never put a border on top of a border that already
+   exists. See [§10 Borders](#10-borders).
+4. **Scoped edits.** Change what was asked for. Unrelated files stay untouched,
+   including work already sitting dirty in the tree.
+5. **Ask before pushing.** At the end of every run, once the work is complete
+   and verified, use the AskUserQuestion tool to ask whether to push the
+   changes to GitHub. Only commit and push when the answer is yes. Never push
+   without asking first.
+
+Working style: finish the task, then report the result in a few lines. No
+preamble, no recaps, no process commentary. When a detail is missing, take the
+reasonable default, note the assumption, and keep moving.
+
+## 2. What this is
+
+A portfolio for Aditya Ojha (tanhio.dev) with a component showcase
+at `/components` that doubles as a public shadcn registry. No backend, no
+database, no auth, no payments. All content is typed configuration.
+
+- Production: https://tanhio.dev
+- Repository: github.com/tanhiowyatt/tanhio.dev
+- Deploy: Vercel, from the main branch
+
+## 3. Stack
+
+| Concern | Choice |
+| --- | --- |
+| Framework | Next.js 16, App Router, React Server Components, Turbopack |
+| UI | React 19 |
+| Inline prompt editing | Tiptap 3.31.4, with inline context chips and plain text submission |
+| Language | TypeScript 5, strict |
+| Styling | Tailwind 4 via `@tailwindcss/postcss`, plus `@tailwindcss/typography` and `tw-animate-css` |
+| Primitives | Radix UI and Base UI, vendored into `components/ui/`; Vaul for the mobile suggestion drawer |
+| Motion | Motion 12 |
+| Icons | HugeIcons for site controls via `components/shared/site-icons.tsx`; `lucide-react` remains in shared UI, published components, and demos; `react-icons` and local assets supply brand icons |
+| Fonts | DM Sans (body), Geist Mono, and Instrument Serif; OG TTFs in `lib/fonts/` |
+| Theming | `next-themes`, class-based dark mode |
+| Dates | `date-fns` 4 with `date-fns-tz` |
+| Markdown | `react-markdown` on the client surface, `next-mdx-remote` with Shiki on the server surface |
+| Tooling | ESLint 9 via `eslint-config-next`, shadcn CLI 4 |
+| Analytics | Vercel Analytics and Speed Insights, both wired into the root layout |
+
+## 4. Commands
+
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server on http://localhost:3000 |
+| `npm run lint` | ESLint across the repo |
+| `npm run registry:build` | Runs `scripts/build-registry.mjs`, writes `public/r/*.json` |
+| `npm run build` | Runs `prebuild` (registry build) then the production build |
+| `npm run start` | Serves the production build |
+
+There is no typecheck script; run `npx tsc --noEmit` directly.
+
+## 5. Directory map
+
+| Path | Contents |
+| --- | --- |
+| `app/` | Routes: `page.tsx` (home), `components/` and `components/[id]/` (showcase; the detail route adds `preview-box.tsx` and `playground.tsx`), `project/[id]/` (case studies), `api/` (discord-status, visitor-count, sponsor-checkout, sponsor-claim, dodo-webhook, component-suggestion); plus `layout.tsx`, `error.tsx`, `globals.css`, `robots.ts`, `sitemap.ts`, `manifest.ts`, `opengraph-image.tsx`, `not-found.tsx`. `bookmarks/` and `certifications/` are home sections only, not routes. |
+| `components/` | Subdivided into `landing/` (one file per home section, hero, about, skills, etc.), `showcase/` (catalog, preview, props panel), `shared/` (header, footer, theme provider, logo), `ui/`, `motion-primitives/`, `skeletons/` |
+| `components/ui/` | Vendored shadcn and Radix primitives; source of most registry items |
+| `components/motion-primitives/` | Motion-heavy building blocks |
+| `components/skeletons/` | Loading placeholders |
+| `config/` | The data layer, one file per domain, plus `types.ts` and `playground.ts` (preview props panel schemas) |
+| `content/` | Markdown docs for the showcase |
+| `lib/` | `utils.ts` (the `cn` helper), `github/` (GitHub data and activity), `registry/` (registry health and source), `discord-status.ts`, `markdown/` (shared Markdown rendering and highlighting), `react-query.ts`, `fonts/` |
+| `public/` | Static assets; `public/r/` holds generated registry JSON |
+| `scripts/` | `build-registry.mjs` |
+| `plans/` | Private planning docs, gitignored |
+
+## 6. Data layer: the database
+
+There is no runtime database and no server-side persistence. The "database" is
+the typed config layer in `config/`: plain TypeScript objects, checked by the
+compiler, imported directly by the components that need them. `config/` is the
+single source of truth for content, change content there, never inline in a
+component.
+
+| File | Holds |
+| --- | --- |
+| `config/types.ts` | Every shared type, plus the `SectionId` union |
+| `config/site.ts` | The root `siteConfig` object, meta, personal info, section order, section flags, banner, about, services, workflow, contact |
+| `config/hero.ts` | `heroConfig`, hero copy |
+| `config/books.ts` | Bookshelf copy and ordered books, local covers, source URLs, and spine presentation |
+| `config/skills.ts` | `skillsSectionConfig` + `skillsConfig` |
+| `config/socials.ts` | `socialSectionConfig` + `socialsConfig` |
+| `config/projects.ts` | `projectsSectionConfig` + `projectsConfig` |
+| `config/section-notes.ts` | Optional handwritten side-note copy and left/right placement, keyed by home section |
+| `config/experience.ts` | `experienceSectionConfig` + `experienceConfig` |
+| `config/components.ts` | `componentsSectionConfig` (home teaser), `componentRegistry` plus `findComponent()` and `getEnabledComponents()` |
+| `config/registry.ts` | Registry helpers, `getAddCommands()` (`@tanhio/<id>` per package manager), `getItemUrl()` and `registryConfig.itemUrlPattern` for the direct-URL fallback |
+| `config/world-cities.ts` | City coordinates used by the dotted world map |
+| `config/insights.ts` | Home Insights heading, 7-day range, and accessible chart copy |
+| `config/sponsors.ts` | `sponsorsSectionConfig` (supporter copy, seat count, CTAs) + `sponsorsConfig`, one entry per supporter |
+
+Pattern to copy: every domain exports a section config object (heading text) and
+a typed item array. Every item carries `id`, `order`, and an optional `enabled`
+flag.
+
+## 7. Schema
+
+All types live in `config/types.ts`.
+
+- **`SiteMetaConfig`**, `url`, `title`, `titleTemplate`, `shortTitle`,
+  `description`, `keywords`, `authors`, `creator`, `publisher`,
+  `classification`, `category`, `locale`, `ogImage`, `twitterCreator`, `icon`,
+  `appleIcon`, `googleVerification`, `manifest`, `robots`, `sitemap`.
+- **`PersonalInfo`**, `fullName`, `firstName`, `avatar` (`src`, `alt`,
+  `fallback`), `location` (`label`, `timezone`), `githubUsername`.
+- **`HeroConfig`**, `greeting`, `waveEmoji`, `headlineBefore`,
+  `highlightedPhrases`, `headlineAfter`, `description`, `descriptionHighlight`.
+- **`AboutConfig`**, fallback `title` and plain-text `body`. `config/site.ts`
+  also exports `aboutGreetings` and typed `aboutItems` for the illustrated
+  introduction. `body` is derived from those items so text exports stay in sync.
+- **`SkillItem`**, `id`, `name`, `icon`, `category` (`language`, `recon`,
+  `web`, `exploitation`), `order`, `enabled`.
+- **`SocialLink`**, `id`, `platform`, `handle`, `href`, `icon`, `order`,
+  `enabled`, `action` (`copy`, `external`, `mailto`), `copyValue`,
+  `shortcutKey`, `tooltipDefault`.
+- **`Project`**, `id`, `title`, `description`, `content`, `image`, `imageAlt`,
+  `liveUrl`, `githubUrl`, `year`, `status` (`building`, `new`, `shipped`),
+  `category`, `tags`, `metrics` (icon `users` or `chart`, plus `label`),
+  `order`, `enabled`.
+- **`ExperienceItem`**, `id`, `role`, `company`, `period`, `summary`,
+  `highlights`, `order`, `enabled`.
+- **`Bookmark` / `Certification`**, `id`, `url`, `title`, `domain`, `date`
+  (certifications only), `icon` component.
+- **`ComponentDoc`**, `id`, `title`, `description`, `icon`, `demoPath`,
+  `docPath`, `order`, `enabled`.
+- **`ContactConfig`**, `title`, `description`, `pricing` (label, value, note),
+  `channels` (reuses `SocialLink`).
+- **`PortfolioConfig`**, `meta`, `personal`, `sectionOrder`, `sectionFlags`,
+  `bookmarks`, `certifications`, `banner`, `about`, `services`, `workflow`,
+  `contact`.
+
+## 8. Sections and flags
+
+The home page is a loop, not a hand-written layout.
+
+- `app/page.tsx` maps over `siteConfig.sectionOrder` and skips any id whose
+  `sectionFlags` entry is false, so reordering or hiding a section is a config
+  change only.
+- Every non-GitHub section has an entry in the `staticSections` map in
+  `app/page.tsx`, keyed by `SectionId` .
+- `github` is special: it is server-fetched, wrapped in React Suspense with
+  `components/skeletons/github-skeleton.tsx`, and only rendered when
+  `GITHUB_TOKEN` is present.
+- The current order is projects, socials, skills, about, sponsors, insights,
+  github, bookshelf, bookmarks, certifications. Work follows the hero so
+  visitors reach projects before the social rows. Experience, services,
+  workflow and contact exist but are flagged off. The `sponsors`
+  section is a compact, single-row logo strip with one invitation, not an orbit
+  or a grid of empty seats. On the home page it sits directly after About.
+  Supporter names appear in tooltips on hover and keyboard focus. Logo hover
+  motion uses the banner's 0.35s spring with 0.3 bounce and respects reduced
+  motion. The invitation's hover uses secondary colors, never primary.
+  The invitation links directly to `/api/sponsor-checkout` with a plain anchor
+  so visitors continue to Dodo's hosted checkout.
+  Its “Supported by” heading matches
+  About's greeting: Instrument Serif italic, 25px with a 32px line height,
+  21px horizontal and 1px vertical padding, and 24px above the heading band.
+  The section also renders at the bottom of `/components`.
+  `/sponsor` explains support and reuses the list. Keep the payment product id
+  and seat indices unchanged when changing the presentation.
+  Hand-edited supporters live in `config/sponsors.ts` and may omit `seat`.
+  Keep them out of `config/sponsors.generated.json`, which belongs to the Dodo
+  webhook and paid claim flow. A manual entry must not reserve a paid seat.
+- Insights sits directly after Sponsors and shows one visitor trend line for the
+  last 7 UTC days. The line touches both frame edges, with no axes, grid, or
+  legend. The area under it uses the footer Earth's ocean blue and ordered 4 by
+  4 Bayer dither, denser toward the top, drawn at real pixel width so it stays
+  crisp. A small label marks the best day, and a dot marks today. Above the
+  chart, visitors, sessions, views, and average time sit in KPI cards styled
+  like the grid: continuous solid row lines, bordered 15px gutters,
+  and the blueprint hatch resolving on hover. Each card holds only a label, the
+  value, and an inline trend against the previous 7 days, with no extra caption.
+  They show four across from the small breakpoint and two by two below it. Use
+  the `success` token for increases and `destructive` for decreases. The
+  section has no attribution or date range row. Hover, touch, and keyboard
+  selection reveal a local line highlight, point, vertical guide, date pill, and
+  daily visitor count. `lib/insights.ts` fetches PostHog server-side (POSTHOG_API_KEY), caches reports for
+  15 minutes, and validates all 7 daily points plus the current and previous
+  summaries. Missing credentials or failed reports show an unavailable message.
+  With `INSIGHTS_TEST_MODE=true`, an all-zeros report is returned so the section
+  renders a test display instead of the unavailable message.
+
+To add a section:
+
+1. Add the id to the `SectionId` union in `config/types.ts`.
+2. Build the component in `components/`.
+3. Register it in `staticSections` in `app/page.tsx`.
+4. Add its flag and its position to `siteConfig`.
+
+Collapsible sections use `AccordionSection` in
+`components/ui/accordion-section.tsx`, it owns the heading, the expand
+animation, and the dashed top rule. Do not hand-roll a second variant.
+
+## 9. Design system
+
+- Colors come from semantic tokens only, `background`, `foreground`, `card`,
+  `popover`, `muted`, `muted-foreground`, `primary`, `secondary`, `accent`,
+  `destructive`, `success`, `border`, `input`, `ring`, and `chart-1` through `chart-5`.
+  The header's candle logo uses the `--logo-wax-*`, `--logo-flame`,
+  `--logo-flame-core`, and `--logo-wick` tokens declared in `app/globals.css`.
+  Never hardcode a hex value in a component.
+- Radii derive from a single `--radius` (0.45rem) as `sm`, `md`, `lg` and up.
+  Use the tokens rather than literal values.
+- Dark mode is class-based: `@custom-variant dark (&:is(.dark *))` plus
+  `next-themes`, so `dark:` utilities follow the `.dark` class on `<html>`.
+- Motion tokens live in `app/globals.css` (`--motion-duration-base`,
+  `--motion-ease-standard`). Home page sections, headings, and content rows
+  render immediately without scroll entrances. About, Skills, and
+  ComponentHighlights stay Server Components. About's greeting is a small client
+  component that uses the visitor's local time, with a stable server fallback.
+  Keep interaction motion such as
+  folder expansion, hover previews. The GitHub
+  contribution calendar fades in with a subtle scale settle when its server-loaded
+  content mounts inside the existing Suspense boundary. Entrances on other
+  surfaces use the shared reveal helpers in
+  `lib/motion.ts` (`reveal`, `revealOnMount`, `revealVariants`): a 0.18s
+  opacity with the ease `[0.22, 1, 0.36, 1]` plus a settle spring on `y`. Only
+  `opacity` and `transform` are animated, never `filter` (animated blur forces
+  a repaint of the whole subtree per frame), and `whileInView` fires once
+  rather than on every scroll pass. The header logo is a golden wax,
+  mountain-shaped A with an orange side face, a wax drip, and an unlit wick
+  on a transparent background, with no tile behind it. Hovering the Home link
+  with a fine pointer or focusing it with the keyboard ignites the candle.
+  Layered flame and core motion create irregular flicker, while pointer position
+  bends the flame through a spring to suggest moving air. A soft amber halo
+  spills beyond the flame and reflects light onto the A. Leaving extinguishes
+  the flame and fades its glow. Animate only transform and opacity, with the
+  flicker paused while unlit. Reduced motion shows a still flame on hover or
+  focus. Touch keeps the unlit golden A and normal Home navigation. Keep the SVG
+  overflow visible and the Home link's 44px target intact. The Vader swap and
+  corner spider web are removed. The hero text and footer
+  quote words are deliberate exceptions and keep their blur-to-sharp resolve.
+  The portrait overlaps the banner at its lower-left edge, with the intro
+  text aligned below it in the original GitHub layout.
+  The hero name uses the supplied `VerseText` component for its comic print
+  and idle glitch, with the foreground and `--verse-text-blend` theme tokens.
+  Keep its built-in reduced-motion and offscreen pauses. The headline,
+  description, and location reveal once on mount with a 3px blur, an 8px rise,
+  and a 0.5s ease-out, with short overlapping delays. Animate only the text, keeping
+  the hero shell and banner still. Reduced motion and no JavaScript show the
+  text immediately, sharp and fully visible. The footer
+  also has a slower one-time staggered entrance for its text and live status.
+  The Earth reveals independently once it clears the bottom fade, with a
+  80px viewport inset. It follows pointer movement with subtle spring-driven
+  parallax, resets on leave, and stays still for touch and reduced motion.
+  Animated elements use `data-reveal` for the reduced-motion override, with a
+  no-JavaScript fallback.
+- The shared header uses separate rounded label and icon pieces, with one link
+  and one focus target per pair. Desktop uses the logo for Home and shows
+  Components and Sponsor as direct links. GitHub stays a separate header control
+  with its star count, alongside search and theme. Mobile keeps the compact
+  header and a matching bottom Menu trigger. Navigation copy and destinations
+  live in `config/navigation.ts`; the mobile menu uses the shared Popover primitive.
+  The menu is one opaque rounded panel with paper-cut icons on the left and
+  a subtle active row. Home uses the shared paper-cut illustration in the menu,
+  while the header retains the compact animated logo. Header label and icon
+  faces are 28.8px tall. Header controls and menu rows retain 44px click targets.
+  Hover icon motion is limited to fine pointers without reduced motion.
+- Shared utility classes: `.section-heading`, `.micro-transition`,
+  `.liquid-glass`, `.bottom-blur`, and the blueprint background used on card
+  hover. Prefer these over repeating the utility stack.
+- `config/diwali.ts` controls the dithered courtyard decoration beside About,
+  outside the home page's right content edge in the former lightsaber slot.
+  It appears from 80rem upward, like the previous margin decorations, and
+  remains independent of the header's candle hover. Hover and keyboard focus show the shared
+  "Happy Diwali" tooltip; hover or activation releases a short paper-petal burst.
+  Reduced motion keeps the scene still and skips confetti. The transparent
+  illustration under `public/diwali/` mounts once when it first nears the viewport
+  on desktop. Keep that iframe and WebGL context mounted while scrolling, pause
+  its rendering offscreen, and resume the same timeline on return. Never mount
+  it below 80rem; dispose it if the viewport crosses into that smaller layout.
+  Render the live scene only, without a fallback image.
+  Reveal it once ready with `revealOnMount`, an 8px upward settle and opacity,
+  never scale. Reduced motion shows the composed live frame immediately.
+  Keep the action disabled while loading or unavailable and retain its accessible
+  scene description. Hide the unavailable artwork instead of substituting a bitmap.
+  Keep the stage at a fixed 220px width, with no viewport-based scaling or camera
+  zoom. Its complete 20-second loop includes a visitor walking forward, waving
+  a sparkler, and walking back, alongside articulated petal placement, swaying
+  lanterns, and a cat reacting. The live canvas preserves transparency in light
+  and dark mode.
+- Public inner-route OG cards use the homepage OG's light palette, centered
+  Geist Serif heading, and paper-cut garden from `config/opengraph.ts`.
+  Keep route descriptions, URLs, and install commands readable above the
+  artwork, with no dark grid or heavy panel. The homepage OG stays unchanged.
+- The shared footer on every page stays within the centered page frame, with a
+  code-rendered, blue dithered Earth rising from the bottom. Keep its quote and
+  credit in `footerConfig` in `config/site.ts`. The Earth turns slowly while
+  visible and stays still for reduced motion. The quote, live Discord status,
+  and credit sit above it, clear of the fixed bottom controls. The visitor count
+  floats centered over the Earth as a liquid-glass pill (`.liquid-glass`, with
+  the displacement map rendered by `footer-scene.tsx`).
+  The footer is a sibling of each page's main, with no
+  opening border or nested frame. The Earth stage is 192px tall on mobile and
+  208px from the small breakpoint, with a 720px minimum artwork width. The
+  land coordinates come from Natural Earth's public-domain 1:110m land dataset.
+  A small blue satellite follows a 32-second tilted orbit above the Earth and
+  disappears behind its far side. Its transform and opacity animation shares
+  the Earth's visibility pause and holds a visible pose for reduced motion.
+  Keep it off other inner routes and preserve the intentional heading styles.
+
+## 10. Borders
+
+This site is drawn with hairlines, and hairlines compound fast. The rule is
+simple: **one border per edge, one mechanism per element.**
+
+- The shell owns the outer frame. `app/layout.tsx` draws the centered column
+  (`max-w-[var(--frame-max-w)]`), the muted gutter (`px-2 border-x`),
+  FrameGutters, and BottomNav. The bottom fade (one masked backdrop blur plus
+  PixelDissolve) stays on `app/page.tsx` only. `<main>` inside the shell
+  carries `border-x bg-background`. The shared footer is on every page, so no route
+  needs `border-b-2` to blend into artwork. Nothing inside main
+  re-declares an outer frame or adds a vertical side rule.
+- Each section owns exactly one dashed top rule (`border-t border-dashed`). If a
+  parent already draws a rule on that edge, the child does not add another.
+- `.section-heading` in `app/globals.css` already declares
+  `border-y border-dashed`. An element using that class must not also carry
+  `border-t` or `border-b`.
+- Pick either `ring-1 ring-inset` or `border`, never both on the same element.
+  In this codebase cards and pills use `ring-1 ring-inset`; separators use
+  `border`.
+- Inside `.prose`, blocks already get a radius. Do not wrap them in a second
+  bordered and ringed container.
+- When a new wrapper is needed, move the border to the outermost element of the
+  group instead of adding one per child.
+- Divider elements use the `Separator` primitive, which draws its own line. Do
+  not add a `border-t` alongside it.
+
+## 11. UI copy
+
+**UI copy uses sentence case.** Capitalize the first letter of labels, buttons,
+headings, and empty states. Avoid `ALL-CAPS` shouting. Do not force strings
+to lowercase.
+
+```tsx
+const TAB_LABELS: Record<Tab, string> = {
+  preview: "Preview",
+  code: "Code",
+};
+const EMPTY_STATE = "No activity right now.";
+```
+
+Guideline:
+
+- tab labels, segmented controls, and collection switchers
+- buttons and their state text (`Copy` → `Copied!` → `Copy failed`)
+- tooltips, `aria-label`, `alt`, and `title` attributes
+- status pills and empty states
+- legends (heatmap `Less` / `More`)
+- page and section headings rendered from code
+- control labels and tooltips that live in `config/` (for example
+  `themeTooltip: "Toggle theme"`)
+
+Sentence case is the default. Title Case is fine for proper nouns and product
+names. What to avoid is `ALL-CAPS` shouting and forcing every string to
+lowercase.
+
+Deliberately **excluded**, leave these as authored:
+
+- **Proper nouns and brand names.** "GitHub", "Discord", "TypeScript",
+  "Next.js", "React", "Visual Studio Code", city names, people's names.
+- **Editorial content in `config/`.** The about body, services, workflow
+  descriptions, bookmark titles, project copy.
+- **SEO and metadata.** `meta.title`, `titleTemplate`, OG image alt text,
+  `generateMetadata` output, and the JSON-LD block in `app/layout.tsx`.
+- **Keyboard key identifiers.** `"ArrowRight"`, `"Home"`, `"End"`, these are
+  DOM `KeyboardEvent.key` values and must match exactly.
+- **Console and thrown errors.** Internal diagnostics, not user-facing copy.
+- **Demo fixture data** under `app/components/[id]/demos/`, sample content that
+  exists to show a component working.
+
+## 12. Typography
+
+- Body copy is DM Sans at 14px (`text-sm`). `text-xs` is for meta, and
+  `text-base` is the largest size in normal use.
+- Headings are `font-medium` with `tracking-tight`. `font-semibold` appears on a
+  few section headings only; nothing is heavier than 600 anywhere.
+- Mono is Geist Mono, 10–12.5px, for meta labels, keyboard hints, and code.
+- Pixel accents used to use `font-pixel` (Geist Pixel Grid); they now use
+  `font-sans` (DM Sans). Serif accents use `font-serif` (Instrument Serif) and
+  appear sparingly.
+- Section headings use the `.section-heading` class rather than ad-hoc sizes.
+- Supplemental section notes use `components/shared/side-note.tsx` with Caveat
+  handwriting and a decorative curved arrow. Keep their copy in
+  `config/section-notes.ts`. They sit in the margins at widths of 80rem and
+  above, without adding a border. Hide the entire note, including its arrow,
+  below that breakpoint.
+
+## 13. Markdown rendering
+
+Two surfaces render Markdown and they must stay in sync.
+
+| Surface | Renderer | File |
+| --- | --- | --- |
+| Component docs at `/components/[id]` | `MarkdownAsync` from `next-mdx-remote`, server-rendered | `app/components/[id]/page.tsx` |
+| Project case studies | `react-markdown`, client-rendered | `app/project/[id]/project-content.tsx` |
+
+- Both pass the shared override map from `lib/markdown/markdown-components.tsx`.
+  Never inline a second set of overrides.
+- Props and item-field tables list required rows first, preserving authored
+  order within the required and optional groups. Required rows show a small
+  superscript label in the primary color beside the prop name.
+- All `.prose` styling lives in one **unlayered** block of `app/globals.css`. It
+  has to stay unlayered: the typography plugin registers its rules through
+  `addComponents`, so `.prose` ends up layered and loses to unlayered CSS
+  regardless of specificity.
+- Prose colors are mapped onto project tokens (`--foreground`,
+  `--muted-foreground`, `--primary`, `--border`). That makes `prose-neutral`
+  and `dark:prose-invert` in markup effectively inert, do not rely on them.
+
+## 14. Registry pipeline
+
+The site publishes its own shadcn registry. It is JSON served over HTTP, and
+the `@tanhio` namespace is listed in the official shadcn directory
+(`ui.shadcn.com/r/registries.json`), so the CLI resolves it with no consumer
+setup.
+
+1. `registry.json` at the root is the catalog, name `tanhio`, homepage
+   tanhio.dev, and an `items` array. Each item declares `name`, `type`,
+   `title`, `description`, `dependencies` (npm packages),
+   `registryDependencies` (shadcn items such as `tooltip`), `files`, and a
+   `docs` string.
+2. `scripts/build-registry.mjs` reads the catalog, inlines each file's source,
+   and writes `public/r/registry.json` plus one `public/r/<name>.json` per
+   item. It runs on `prebuild`, so Vercel always ships fresh JSON.
+3. The install form shown to users is always the namespace form,
+   `npx shadcn add @tanhio/<name>`. `getAddCommands()` returns it per package
+   manager, and the `docs` string of every item in `registry.json` carries it
+   too. `getItemUrl()` returns the direct `https://tanhio.dev/r/<name>.json`
+   form, which still works and is the fallback if the directory index ever
+   fails, but it is deliberately not surfaced in any install block.
+
+Rules:
+
+- Never reintroduce a `components.json` setup step into UI copy. Because the
+  namespace is indexed, there is nothing for a consumer to configure, and the
+  old `getRegistrySetupSnippet()` helper was removed for that reason.
+- Any edit to a file listed in `registry.json` must be followed by
+  `npm run registry:build`, or the published JSON goes stale.
+- The directory entry is also an input, not just an output. shadcn monitors it
+  and publishes a `health` object per registry at
+  `ui.shadcn.com/r/registries.json`. `lib/registry/registry-health.ts` (server-only)
+  fetches that index hourly and `config/registry-health.ts` holds the shared
+  types, labels, and points per breakdown component, so the pill strip under
+  the catalog on `/components` is the published record rather than a claim. If
+  the fetch or the parse fails, the strip renders nothing, by design.
+- Published files must be self-contained. A consumer's project has no `config/`
+  directory, no `@/config/*` imports, and no site-specific data. Inline data or
+  accept it as props.
+- Self-containment wins over the §9 token rule: published files may inline
+  literal colors (hex/oklch) or use `var(--token, literal-fallback)` so they
+  still render in projects that lack this site's tokens. Site-internal
+  components still follow §9.
+- Keep UI copy inside published components in sentence case too. It is part of the
+  design language consumers are installing. Avoid uppercase shouting there as well.
+- Current items: bookshelf, dotted-world-map, copy-command-block, github-map,
+  project-explorer, progressive-blur, infinite-slider, carousel, mode-toggler,
+  interactive-skill-cloud, contact-channels, section-rail, progress-bars,
+  command-palette, ask-ai, model-picker, glyph-card, snake, stack-rolodex,
+  prompt-bar, theme-switcher, todo-list.
+
+## 15. Component showcase
+
+- `config/components.ts` holds `componentRegistry` plus two helpers:
+  `findComponent(id)` skips disabled entries, and `getEnabledComponents()`
+  returns enabled entries sorted by `order`.
+- Cards and the home teaser use the optional `summary` field for short copy,
+  with foreground titles and muted descriptions. The full `description` remains
+  the source for detail pages and metadata.
+- The catalog install example uses `RotatingInstallCommand`, with package
+  manager tabs directly above the cycling command and no extra component label
+  or selector. Rotation pauses on hover, focus, and touch, and stays static for
+  reduced motion. Preserve the existing install analytics event names and location.
+- Detail previews use a compact, content-sized stage with a bounded maximum
+  height. The stage owns demo padding; avoid duplicating it in small demos.
+- A 20px spacer using the existing `.blueprint-bg` utility separates the
+  installation command from the catalog, with no featured preview section or
+  spotlight configuration. The spacer owns its top border; the catalog supplies
+  the bottom edge.
+- The catalog reuses the home components section's `SideNote` and
+  `sectionNotes.components` copy. The shared note stays in the page margin from
+  80rem upward, with the route shell allowing overflow at that breakpoint.
+- The suggestion flow (`components/showcase/component-suggestion.tsx`) is
+  currently kept out of the catalog while its entry point is reconsidered.
+  It uses a dialog on desktop and a Vaul drawer on mobile, and POSTs to
+  `/api/component-suggestion`, which
+  moderates (heuristics plus Jev when `TYPESAFE_API_KEY` is set) and forwards
+  to the Discord webhook. Moderation rejects answer 200 with a fake success
+  so abusers get no signal. The X handle is required; success copy says we
+  will contact that handle about progress.
+- Each entry points at a live demo under `app/components/[id]/demos/` and a
+  Markdown doc under `content/components/`.
+- `getComponentIcon(name)` in `components/showcase/component-icons.tsx` maps an
+  `icon` key onto its icon component. Both the showcase and the home teaser use
+  it, do not write a second switch.
+  Component detail breadcrumbs show that shared icon beside the current title.
+- Catalog icons are bespoke paper-cut SVG illustrations, with muted ink outlines,
+  paper edges, offset print shadows, small halftone details, and restrained blue
+  and warm accents from the semantic color tokens.
+  The catalog and home teaser show them at 33.3px without a bordered icon box.
+  Hovering an individual component card lifts and tilts its icon through the
+  named `component-card` group and shared `.micro-transition`. Keep this motion
+  limited to fine pointers and visitors without reduced-motion preferences.
+  Keep their strokes light so the text leads. Only the two newest entries carry
+  the `new` flag in `config/components.ts`.
+  The `New` pill overlaps the artwork directly. Keep the shared icon mapping
+  for the smaller navigation placements too.
+  The How I Work rows reuse the same `PaperCutIcon` base for their
+  scope, communication, and handoff icons, keyed by the item`s `icon` field.
+  The project explorer`s year folders draw with the same paper-cut recipe (offset
+  shadow, paper edge, blue wash, halftone dots) instead of per-year color fills.
+- Set `enabled: false` to hide an entry without deleting it.
+- To add a component: write the doc file, write the demo file, add the catalog
+  entry, and, if it should be installable, add the file to `registry.json`.
+- `config/playground.ts` holds one optional control schema per component. When
+  an entry exists, the detail page renders a props panel under the preview. The
+  panel only ever feeds the live preview: the props table in the Markdown doc is
+  static and is never generated from the schema, so the two can drift and that
+  is accepted.
+- Adding a schema means three edits: the entry in `config/playground.ts`, a
+  props signature on the demo (`Partial<XProps> = {}`, so the detail page
+  renders the same defaults), and an `as ComponentType<Record<string, unknown>>`
+  cast on that demo's loader in `components/showcase/component-demo.tsx`, which
+  is the one place the untyped props channel is widened.
+- Demo props must default to what the home teaser renders today, so the first
+  paint of a component does not change when it gains a schema.
+- Keep panel control keys identical to the documented prop names: the copied
+  snippet is built from them.
+- Panel chrome: one container, one level. A tinted background (`bg-muted/20`),
+  no border, and no nested box, since the preview box above already supplies
+  the frame. Radii stay concentric: the preview frame is `rounded-2xl` with a
+  4px inset stage at `rounded-xl`, and the panel matches the frame's radius so
+  the stacked containers line up on both edges.
+
+## 16. Environment
+
+### Bookshelf
+
+- The reusable shelf lives in `components/ui/bookshelf.tsx` with its adjacent
+  CSS module. The home section in `components/landing/bookshelf.tsx` supplies
+  config copy, the initial book, the section rule, and scroll reveal. The
+  `/components/bookshelf` demo reuses the same book data without a second rule.
+- The public `bookshelf` registry item ships the component, CSS module, and
+  `lib/motion.ts`. It accepts book data and accessible copy as props, with no
+  config imports or bundled cover assets. The default is all books closed,
+  a 10px hover lift, and no entrance; the homepage opts into its original
+  selected book and entrance. The playground controls `liftAmount`.
+
+- The bookshelf is a home section directly before Bookmarks, with `/#bookshelf`
+  in the command palette and no standalone route. Its data lives in
+  `config/books.ts`; optimized cover assets
+  live in `public/images/books/`, with their original sources in the config.
+- The shelf opens `bookshelfConfig.defaultBookId` on first render. Hover lifts
+  a closed book gently with a spring, without changing the selected cover.
+  Opening a book eases it back onto the shelf; open covers never lift. Click,
+  tap, Enter, or Space selects a cover; activating it again, clicking outside,
+  or Escape closes it. Focus alone never opens a book. Keep the shelves free
+  of drop shadows; disable the lift for touch and reduced motion.
+- All books share one continuous row at every width. Narrow screens scroll
+  horizontally instead of splitting the collection onto more shelves.
+  The mobile ledge spans the full section width and uses the `rounded-lg` radius.
+- Covers and spines use local SVG paths, preserving each edition's lettering
+  and colors. Photographic cover artwork is interpreted as layered vector
+  illustrations, never embedded raster images. Keep original artwork source
+  URLs in the book config. Reveal the flat cover with an opacity transition,
+  not perspective rotation, skew, baked-in mockup shadows, or 3D page planes.
+- Keep cover images mounted and eagerly loaded before selection. Clip hidden
+  artwork inside each book so preloaded covers cannot widen the scroll rail.
+- Books reveal once on scroll with the shared reveal helper: a 28px rise,
+  60ms stagger, and 120px bottom viewport inset to clear the fixed fade.
+  This is a deliberate exception to the immediate home-section rendering rule.
+  Keep the reduced-motion and no-JavaScript fallbacks. No title, author, or
+  hint caption appears below the shelf; each button retains its accessible label.
+- Keep the header navigation and footer routes unchanged.
+
+| Variable | Used by | Behaviour when missing |
+| --- | --- | --- |
+| `GITHUB_TOKEN` | `app/page.tsx` | GitHub section skipped entirely, by design, not a bug |
+| `DISCORD_USER_ID` | `app/api/discord-status/route.ts` | Falls back to hardcoded ID `1243105196477911061` |
+| `NEXT_PUBLIC_POSTHOG_KEY` | `lib/analytics.ts` | PostHog client not loaded; no client-side tracking |
+| `NEXT_PUBLIC_POSTHOG_HOST` | `lib/analytics.ts` | Defaults to `https://us.i.posthog.com` |
+| `POSTHOG_API_KEY` | `lib/posthog-analytics.ts`, `lib/insights.ts`, `lib/visitor-count.ts` | Server PostHog queries return `null`; Insights and visitor counter hidden |
+| `DISCORD_COMPONENT_SUGGESTION_WEBHOOK_URL` | — (no active route) | Not used; component-suggestion flow inactive |
+| `TON_CENTER_API_URL` | `lib/ton/verify.ts` | Defaults to `https://toncenter.com/api/v3` |
+| `TON_CENTER_API_KEY` | `lib/ton/verify.ts` | Sent as `X-API-Key` header when present; requests work without it |
+| `TON_OWNER_ADDRESS` | `app/api/ton/payment/create/route.ts`, `lib/ton/verify.ts` | Defaults to `tanhiowyatt.ton` (DNS-resolved) |
+
+`next.config.ts` sets `experimental.agentUpgrade: "security"` (Next.js 16.4.6). It opts Next.js into security-upgrade tooling; do not remove it when editing the config.
+
+Gotchas:
+
+- A dev server is normally already running on http://localhost:3000. Starting a
+  second one fails with "Another next dev server is already running", reuse
+  the existing one rather than switching ports.
+- `next build` cannot run in the sandbox: Turbopack's cleanup of
+  `.next/turbopack` trips the bulk-delete guard. Validate with
+  `npx tsc --noEmit` and the dev server instead.
+- `var(--font-mono)` does not work in hand-written CSS. `@theme inline` makes
+  Tailwind inline the value instead of emitting the variable, so use the
+  `font-mono` utility or `var(--font-geist-mono)`.
+- `plans/` is gitignored and is not part of the shipped site.
+
+## 17. Definition of done
+
+1. `npx tsc --noEmit`
+2. `npm run lint`
+3. `npm run registry:build` if any file referenced by `registry.json` changed
+4. Check the result in the dev server on http://localhost:3000
+5. Update this file if a convention changed
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
