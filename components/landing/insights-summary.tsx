@@ -6,10 +6,11 @@ const number = new Intl.NumberFormat("en-GB");
 const percentage = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 1 });
 
 function duration(seconds: number) {
+  const hours = Math.floor(seconds / 3600);
   const minutes = Math.floor(seconds / 60);
-  return minutes
-    ? `${number.format(minutes)}m ${seconds % 60}s`
-    : `${seconds}s`;
+  if (hours > 0) return `${hours}h`;
+  if (minutes > 0) return `${minutes}m`;
+  return `${Math.round(seconds)}s`;
 }
 
 function compare(current: number | null, before: number | null) {

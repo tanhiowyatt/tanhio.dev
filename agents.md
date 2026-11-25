@@ -179,20 +179,20 @@ The home page is a loop, not a hand-written layout.
   Keep them out of `config/sponsors.generated.json`, which belongs to the Dodo
   webhook and paid claim flow. A manual entry must not reserve a paid seat.
 - Insights sits directly after Sponsors and shows one visitor trend line for the
-  last 7 UTC days. The line touches both frame edges, with no axes, grid, or
-  legend. The area under it uses the footer Earth's ocean blue and ordered 4 by
+  last 7 UTC days (or fewer, counting from `LAUNCH_DATE` if set). The line
+  touches both frame edges, with no axes, grid, or legend. The area under it uses the footer Earth's ocean blue and ordered 4 by
   4 Bayer dither, denser toward the top, drawn at real pixel width so it stays
   crisp. A small label marks the best day, and a dot marks today. Above the
   chart, visitors, sessions, views, and average time sit in KPI cards styled
   like the grid: continuous solid row lines, bordered 15px gutters,
   and the blueprint hatch resolving on hover. Each card holds only a label, the
-  value, and an inline trend against the previous 7 days, with no extra caption.
+  value, and an inline trend against the previous period, with no extra caption.
   They show four across from the small breakpoint and two by two below it. Use
   the `success` token for increases and `destructive` for decreases. The
   section has no attribution or date range row. Hover, touch, and keyboard
   selection reveal a local line highlight, point, vertical guide, date pill, and
   daily visitor count. `lib/insights.ts` fetches PostHog server-side (POSTHOG_API_KEY), caches reports for
-  15 minutes, and validates all 7 daily points plus the current and previous
+  15 minutes, and validates all daily points plus the current and previous
   summaries. Missing credentials or failed reports show an unavailable message.
   With `INSIGHTS_TEST_MODE=true`, an all-zeros report is returned so the section
   renders a test display instead of the unavailable message.

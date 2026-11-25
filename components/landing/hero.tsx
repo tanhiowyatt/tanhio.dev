@@ -71,7 +71,7 @@ export function Hero() {
       <Image
         src="/images/hero-banner.gif"
         alt="Hero banner"
-        className="w-full h-56 object-cover rounded-xl border border-border/50"
+        className="w-full h-[168px] sm:h-56 object-cover block rounded-xl border border-border/50"
         width={1200}
         height={400}
         unoptimized
@@ -80,20 +80,20 @@ export function Hero() {
 
       {/* Portrait overlapping the banner (half on, half off) + nickname */}
       <div className="mt-4 sm:mt-6 relative z-10 w-full">
-        <div className="flex sm:flex-row flex-col items-start gap-6 sm:gap-8 min-w-0">
-          <div className="w-[64px] sm:w-[112px] shrink-0">
+        <div className="flex sm:flex-row flex-col items-start gap-4 sm:gap-8 min-w-0">
+          <div className="w-[90px] sm:w-[112px] shrink-0">
             <InteractiveSticker
               src={siteConfig.personal.avatar.src}
               alt={siteConfig.personal.avatar.alt}
               label="Profile picture"
               tilt={-5}
-              sizes="(max-width: 640px) 64px, 112px"
+              sizes="(max-width: 640px) 90px, 112px"
               soundSrc="/profile-pop.mp3"
               className="aspect-square w-full rounded-xl ring-1 ring-inset ring-border"
             />
           </div>
-          <div className="flex-1 min-w-0 flex flex-col gap-2 sm:gap-3">
-            <div className="flex items-baseline min-w-0">
+          <div className="flex-1 min-w-0 w-full sm:w-auto flex flex-col gap-2 sm:gap-3">
+            <div className="flex items-baseline min-w-0 w-full sm:w-auto">
               <VerseText
                 text="tanhiowyatt"
                 className="font-serif text-2xl sm:text-3xl mr-2 sm:mr-3"
@@ -116,12 +116,18 @@ export function Hero() {
                   )}
                 </span>
               </motion.span>
-              <span className="self-center w-1.5 h-1.5 rounded-full bg-muted-foreground" />
-              <span className="ml-[25px]"><LocationTime /></span>
+              <motion.span
+                data-reveal=""
+                variants={textVariants}
+                className="self-center w-1.5 h-1.5 rounded-full bg-muted-foreground hidden sm:block"
+              />
+              <motion.span data-reveal="" variants={textVariants} className="no-js-visible inline-block ml-auto sm:ml-[25px] text-right sm:text-left">
+                <LocationTime />
+              </motion.span>
             </div>
             <motion.h1
               data-reveal=""
-              className="no-js-visible text-xs sm:text-sm md:text-base font-semibold leading-[1.05] tracking-tight text-balance"
+              className="no-js-visible text-base sm:text-sm md:text-base font-semibold leading-[1.05] tracking-tight text-balance"
               variants={textVariants}
               custom={0.1}
             >
@@ -130,7 +136,7 @@ export function Hero() {
 
             <motion.p
               data-reveal=""
-              className="no-js-visible text-xs text-muted-foreground"
+              className="no-js-visible text-base sm:text-sm text-muted-foreground"
               variants={textVariants}
               custom={0.18}
             >

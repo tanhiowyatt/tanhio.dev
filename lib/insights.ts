@@ -6,7 +6,12 @@ import type {
   InsightReport,
   InsightSummary,
 } from "@/config/types";
-import { getDailyPageViews, getDailyPageViewsRange } from "@/lib/posthog-analytics";
+import type { PostHogTrafficPoint } from "@/lib/posthog-analytics";
+import {
+  getAverageEngagedSeconds,
+  getDailyPageViews,
+  getDailyPageViewsRange,
+} from "@/lib/posthog-analytics";
 
 const DAY_MS = 86_400_000;
 
@@ -16,31 +21,36 @@ function testModeEnabled(): boolean {
 }
 
 /*
- * Builds an InsightReport from PostHog daily page view points.
- * PostHog captures $pageview events client-side; sessions and engaged time are
- * not available through the Query API, so visitors/sessions/pageviews all
- * map to the page view total and averageEngagedSeconds is null.
+ * Builds an InsightReport from PostHog daily traffic points.
+ * Each point aggregates unique visitors (uniq distinct_id), unique sessions
+ * (uniq $session_id), and total page views per day. The summary maps each
+ * metric to its own total rather than collapsing all three into one number.
  */
 function buildPostHogReport(
-  points: { date: string; pageViews: number }[],
-  previous: { date: string; pageViews: number }[],
+  points: PostHogTrafficPoint[],
+  previous: PostHogTrafficPoint[],
+  averageEngagedSeconds: number | null,
 ): InsightReport {
-  const total = points.reduce((sum, p) => sum + p.pageViews, 0);
-  const previousTotal = previous.reduce((sum, p) => sum + p.pageViews, 0);
+  const totalVisitors = points.reduce((sum, p) => sum + p.visitors, 0);
+  const totalSessions = points.reduce((sum, p) => sum + p.sessions, 0);
+  const totalPageviews = points.reduce((sum, p) => sum + p.pageviews, 0);
+  const previousTotalVisitors = previous.reduce((sum, p) => sum + p.visitors, 0);
+  const previousTotalSessions = previous.reduce((sum, p) => sum + p.sessions, 0);
+  const previousTotalPageviews = previous.reduce((sum, p) => sum + p.pageviews, 0);
   const summary: InsightSummary = {
-    visitors: total,
-    sessions: total,
-    pageviews: total,
-    averageEngagedSeconds: null,
+    visitors: totalVisitors,
+    sessions: totalSessions,
+    pageviews: totalPageviews,
+    averageEngagedSeconds,
   };
   const previousSummary: InsightSummary = {
-    visitors: previousTotal,
-    sessions: previousTotal,
-    pageviews: previousTotal,
+    visitors: previousTotalVisitors,
+    sessions: previousTotalSessions,
+    pageviews: previousTotalPageviews,
     averageEngagedSeconds: null,
   };
   return {
-    points: points.map((p) => ({ date: p.date, visitors: p.pageViews })),
+    points: points.map((p) => ({ date: p.date, visitors: p.visitors })),
     summary,
     previous: previousSummary,
   };
@@ -48,8 +58,7 @@ function buildPostHogReport(
 
 function dateRange(days: number): string[] {
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const end = Date.parse(`${today.toISOString().slice(0, 10)}T00:00:00Z`);
+  const end = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
   return Array.from({ length: days }, (_, index) =>
     new Date(end - (days - 1 - index) * DAY_MS)
       .toISOString()
@@ -84,23 +93,48 @@ function zeroReport(): InsightReport {
   return { points, summary: empty, previous: { ...empty } };
 }
 
+function effectiveDays(): number {
+  const { days, launchDate } = insightsConfig;
+  if (!launchDate) return days;
+  const launchTime = new Date(launchDate).getTime();
+  if (Number.isNaN(launchTime)) return days;
+  const elapsed = Math.ceil(
+    (Date.now() - launchTime) / 86_400_000
+  );
+  return Math.max(1, Math.min(days, elapsed));
+}
+
 async function getPostHogInsights(): Promise<InsightReport | null> {
-  const days = insightsConfig.days;
+  const days = effectiveDays();
   const dates = dateRange(days);
 
+  if (dates.length === 0) return zeroReport();
+
   const points = await getDailyPageViews(days);
-  if (points.length === 0) return null;
+  const averageEngagedSeconds = await getAverageEngagedSeconds(days);
+
+  const pointsMap = new Map(points.map((p) => [p.date, p]));
+  const filledPoints = dates.map((date) => {
+    const point = pointsMap.get(date);
+    return {
+      date,
+      visitors: point?.visitors ?? 0,
+      sessions: point?.sessions ?? 0,
+      pageviews: point?.pageviews ?? 0,
+    };
+  });
 
   // Previous period: same number of days immediately before the current range.
-  const previousStart = new Date(dates[0]);
-  previousStart.setDate(previousStart.getDate() - days);
-  const previousEnd = new Date(dates[0]);
-  previousEnd.setDate(previousEnd.getDate() - 1);
+  // All dates are UTC to match PostHog's HogQL timestamps.
+  const previousStart = new Date(`${dates[0]}T00:00:00Z`);
+  previousStart.setUTCDate(previousStart.getUTCDate() - days);
+  const previousEnd = new Date(`${dates[0]}T00:00:00Z`);
+  previousEnd.setUTCDate(previousEnd.getUTCDate() - 1);
 
   const previous = await getDailyPageViewsRange(
     previousStart.toISOString().slice(0, 10),
     previousEnd.toISOString().slice(0, 10),
   );
 
-  return buildPostHogReport(points, previous);
+  return buildPostHogReport(filledPoints, previous, averageEngagedSeconds);
 }

@@ -98,7 +98,7 @@ export function GitHubActivity({ calendar }: { calendar: ActivityCalendar }) {
           {copy.keyboardHint}
         </p>
         <div
-          className="no-scrollbar overflow-x-hidden overflow-y-hidden pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="no-scrollbar overflow-x-auto sm:overflow-x-hidden overflow-y-hidden pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <div className="w-full px-0.5">
             <div

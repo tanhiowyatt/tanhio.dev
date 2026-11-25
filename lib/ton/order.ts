@@ -20,4 +20,4 @@ export function buildComment(orderId: string): string {
 }
 
 /** The TON amount for a sponsor seat, in nano-TON (5 TON). */
-export const TON_AMOUNT_NANO = "5000000000";
+export const TON_AMOUNT_NANO = "100000000";

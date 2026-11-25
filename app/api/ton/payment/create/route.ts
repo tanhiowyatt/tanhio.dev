@@ -1,9 +1,10 @@
 /* Creates a TON payment order for a sponsor seat.
 
-Generates a unique `orderId`, resolves the owner wallet address, and returns
-the payment details the frontend needs to build a TON Connect `sendTransaction`
-call. The `comment` (`PAY:<orderId>`) is embedded in the transfer so the
-backend can later match the on-chain transaction to this order. */
+Generates a unique `orderId`, reads the owner wallet address directly from
+`TON_OWNER_ADDRESS`, and returns the payment details the frontend needs to
+build a TON Connect `sendTransaction` call. The `comment` (`PAY:<orderId>`)
+is embedded in the transfer so the backend can later match the on-chain
+transaction to this order. */
 
 import { NextResponse } from "next/server";
 
@@ -14,12 +15,17 @@ export const dynamic = "force-dynamic";
 
 export async function POST() {
   try {
+    const ownerAddress = process.env.TON_OWNER_ADDRESS;
+    if (!ownerAddress) {
+      return NextResponse.json(
+        { error: "Payment address not configured." },
+        { status: 500 },
+      );
+    }
+
     const orderId = createOrderId();
     const comment = `PAY:${orderId}`;
     const commentEncoded = buildPaymentComment(orderId);
-
-    // Resolve owner address: env var first, then fall back to the .ton domain.
-    const ownerAddress = process.env.TON_OWNER_ADDRESS ?? "tanhiowyatt.ton";
 
     return NextResponse.json({
       orderId,

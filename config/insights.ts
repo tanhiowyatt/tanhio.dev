@@ -3,6 +3,7 @@ import type { InsightSummary } from "@/config/types";
 export const insightsConfig = {
   title: "Insights",
   days: 7,
+  launchDate: process.env.LAUNCH_DATE,
   chartLabel: "Daily visitors over the last 7 days, in UTC",
   instructions:
     "Hover or touch to explore. Use the left and right arrow keys to move between days. Press Escape to clear the selection.",

@@ -10,41 +10,10 @@ import "server-only";
 import { Address, Cell, beginCell, toNano } from "@ton/core";
 
 const TON_AMOUNT_NANO = toNano(5);
-const OWNER_DOMAIN = "tanhiowyatt.ton";
 
 const API_URL = process.env.TON_CENTER_API_URL ?? "https://toncenter.com/api/v3";
 const API_KEY = process.env.TON_CENTER_API_KEY;
 const OWNER_ADDRESS_RAW = process.env.TON_OWNER_ADDRESS;
-
-/** Resolves the owner address: env var first, then TON Center DNS, else the domain string. */
-async function resolveOwnerAddress(): Promise<string> {
-  if (OWNER_ADDRESS_RAW) {
-    try {
-      return Address.parse(OWNER_ADDRESS_RAW).toString();
-    } catch {
-      // fall through to DNS resolution
-    }
-  }
-
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10_000);
-
-    const response = await fetch(
-      `${API_URL}/dns?domain=${encodeURIComponent(OWNER_DOMAIN)}`,
-      { signal: controller.signal },
-    ).finally(() => clearTimeout(timeout));
-
-    if (response.ok) {
-      const data = (await response.json()) as { address?: string };
-      if (data?.address) return Address.parse(data.address).toString();
-    }
-  } catch {
-    // fall through
-  }
-
-  return OWNER_DOMAIN;
-}
 
 /** Encodes a TON comment message body: 32 zero bits + UTF-8 string, base64 Boc. */
 function encodeComment(comment: string): string {
@@ -78,32 +47,14 @@ export interface TonPaymentResult {
   amountNano?: string;
 }
 
-/** Resolves a TON address: parse first, then TON Center DNS, else raw string. */
-async function resolveAddress(raw: string): Promise<string> {
+/** Parses the owner address from TON_OWNER_ADDRESS (EQ…/UQ… user-friendly format). */
+function ownerAddress(): string {
+  if (!OWNER_ADDRESS_RAW) return "";
   try {
-    return Address.parse(raw).toString();
+    return Address.parse(OWNER_ADDRESS_RAW).toString();
   } catch {
-    // fall through to DNS resolution
+    return OWNER_ADDRESS_RAW;
   }
-
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10_000);
-
-    const response = await fetch(
-      `${API_URL}/dns?domain=${encodeURIComponent(raw)}`,
-      { signal: controller.signal },
-    ).finally(() => clearTimeout(timeout));
-
-    if (response.ok) {
-      const data = (await response.json()) as { address?: string };
-      if (data?.address) return Address.parse(data.address).toString();
-    }
-  } catch {
-    // fall through
-  }
-
-  return raw;
 }
 
 /**
@@ -115,16 +66,28 @@ export async function verifyTonPayment(
   orderId: string,
   senderAddress?: string,
 ): Promise<TonPaymentResult> {
-  const ownerAddress = await resolveOwnerAddress();
-  const resolvedSender = senderAddress ? await resolveAddress(senderAddress) : undefined;
+  const owner = ownerAddress();
   const expectedComment = `PAY:${orderId}`;
+  const resolvedSender = senderAddress
+    ? (() => {
+        try {
+          return Address.parse(senderAddress).toString();
+        } catch {
+          return senderAddress;
+        }
+      })()
+    : undefined;
+
+  if (!owner) {
+    return { paid: false, orderId };
+  }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15_000);
 
   try {
     const url = `${API_URL}/getTransactions?address=${encodeURIComponent(
-      ownerAddress,
+      owner,
     )}&limit=100&archival=true`;
 
     const response = await fetch(url, {
@@ -162,7 +125,7 @@ export async function verifyTonPayment(
       const destination = tx.in_msg.destination;
       if (!destination) continue;
       try {
-        if (Address.parse(destination).toString() !== ownerAddress) continue;
+        if (Address.parse(destination).toString() !== owner) continue;
       } catch {
         continue;
       }

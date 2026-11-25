@@ -106,6 +106,13 @@ export const sponsorPageConfig: SponsorPageConfig = {
 export const sponsorsConfig: Sponsor[] = [
   // Hand-edited sponsors. `logo` is an optional square image src; paid
   // sponsors that have not claimed yet fall back to an Avvvatars shape.
+  {
+    id: "syntlabs",
+    name: "SyntLabs",
+    url: "https://syntlabs.com",
+    logo: "/sponsors/syntlabs.png",
+    order: 1,
+  },
 ];
 
 /** Every sponsor in authored order: hand-edited first, then webhook-paid. */

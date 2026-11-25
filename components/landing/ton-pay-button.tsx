@@ -54,7 +54,7 @@ export function TonPayButton({
     setErrorMessage(null);
 
     try {
-      if (!tonConnectUI.connected) {
+      if (!tonConnectUI?.connected) {
         // Reserve scrollbar space ahead of time so the TON Connect SDK's own
         // overflow: hidden (set when the wallet modal opens) never changes
         // page width. Only applied when a scrollbar actually exists.
@@ -88,7 +88,7 @@ export function TonPayButton({
 
         setStatus("connecting");
         try {
-          await tonConnectUI.connectWallet();
+          await tonConnectUI?.connectWallet();
         } finally {
           if (header) {
             header.style.position = "";
@@ -101,6 +101,10 @@ export function TonPayButton({
             document.documentElement.style.scrollbarGutter = "";
           }
         }
+
+        if (!tonConnectUI?.connected) {
+          throw new Error("Failed to connect wallet. Try again.");
+        }
       }
 
       setStatus("sending");
@@ -109,29 +113,39 @@ export function TonPayButton({
       const { orderId: createdOrderId, address, commentEncoded, amount } = await response.json();
       setOrderId(createdOrderId);
 
-      await tonConnectUI.sendTransaction({
+      await tonConnectUI?.sendTransaction({
         validUntil: Math.floor(Date.now() / 1000) + 600,
         messages: [{ address, amount, payload: commentEncoded }],
       });
 
       setStatus("verifying");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "An error occurred.";
+      const rawMessage = err instanceof Error ? err.message : "An error occurred.";
       // Suppress TON Connect SDK cancellation errors — user chose not to connect,
       // don't leak raw SDK errors onto the page.
-      if (message.includes("Wallet was not connected")) {
+      if (rawMessage.includes("Wallet was not connected")) {
         setStatus("idle");
         return;
       }
+      // Map common SDK errors to user-friendly copy in sentence case.
+      const message =
+        rawMessage.includes("Transaction was not sent")
+          ? "Transaction was not sent. Try again."
+          : rawMessage;
       setErrorMessage(message);
       setStatus("idle");
-    }
+}
   };
 
+  const buttonClass = cn(
+    "micro-transition min-h-11 relative items-center justify-center rounded-md px-4 py-2.5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+    compact ? "inline-flex size-10 px-2 min-h-10" : "flex gap-2 flex-shrink-0 min-w-[128px]",
+  );
+
   return (
-    <>
+    <div className="relative">
       {errorMessage && !compact && (
-        <p className="mb-2 text-xs leading-relaxed text-destructive">
+        <p className="absolute -top-[22px] left-0 w-full text-xs leading-relaxed text-destructive text-center">
           {errorMessage}
         </p>
       )}
@@ -139,15 +153,13 @@ export function TonPayButton({
         onClick={handlePay}
         disabled={isBusy}
         className={cn(
-          "micro-transition min-h-11 relative items-center justify-center rounded-md px-4 py-2.5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+          buttonClass,
           "bg-primary text-primary-foreground hover:bg-primary/90",
-          compact ? "inline-flex size-10 px-2 min-h-10" : "flex gap-2 flex-shrink-0 min-w-[128px]",
           className,
         )}
       >
         {isBusy ? (
           <>
-            {/* Invisible placeholder keeps the button width identical to idle state. */}
             <span className="opacity-0">
               <Plus aria-hidden className="size-4" />
             </span>
@@ -161,10 +173,10 @@ export function TonPayButton({
         ) : (
           <>
             <Plus aria-hidden className="size-4" />
-            Pay 5 Gram 
+            Pay 5 Gram
           </>
         )}
       </button>
-    </>
+    </div>
   );
 }
