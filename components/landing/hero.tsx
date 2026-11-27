@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 import { MOTION_EASE } from "@/lib/motion";
 import { motion, type Variants } from "motion/react";
 import { InteractiveSticker } from "./interactive-sticker";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { type CSSProperties, useEffect, useState } from "react";
 
 // Keep blur on the text itself, so the banner and section shell stay sharp.
@@ -38,7 +39,6 @@ const locationTimeFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 function LocationTime() {
-  const [showTime, setShowTime] = useState(false);
   const [time, setTime] = useState("");
 
   useEffect(() => {
@@ -49,14 +49,18 @@ function LocationTime() {
   }, []);
 
   return (
-    <span
-      onMouseEnter={() => setShowTime(true)}
-      onMouseLeave={() => setShowTime(false)}
-      className="inline-block min-w-[180px] text-sm font-mono text-muted-foreground"
-      title={siteConfig.personal.location.timeLabel}
-    >
-      {showTime ? time : siteConfig.personal.location.label}
-    </span>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span
+          className="inline-block text-sm font-mono text-muted-foreground"
+        >
+          {siteConfig.personal.location.label}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{time}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 

@@ -164,6 +164,11 @@ export function ClaimForm() {
       return;
     }
 
+    if (!senderAddress) {
+      setClaimError({ message: "Sender address is required." });
+      return;
+    }
+
     const data = new FormData(event.currentTarget);
     data.set("orderId", orderId);
     data.set("senderAddress", senderAddress);
@@ -259,7 +264,7 @@ export function ClaimForm() {
                   id="verify-order-id"
                   type="text"
                   autoComplete="off"
-                  placeholder="ton_…"
+                  placeholder="tanhio.dev_…"
                   value={orderId}
                   onChange={(e) => setOrderId(e.target.value.trim())}
                   className={inputClass}

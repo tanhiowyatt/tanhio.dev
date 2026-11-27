@@ -2,7 +2,7 @@
 
 import { useTonConnectUI } from "@tonconnect/ui-react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Plus, Loader2 } from "@/components/shared/site-icons";
 
@@ -18,9 +18,39 @@ export function TonPayButton({
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isBusy =
     status === "connecting" || status === "sending" || status === "verifying";
+
+  const stopDisconnectTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const startDisconnectTimer = useCallback(() => {
+    stopDisconnectTimer();
+    timerRef.current = setTimeout(async () => {
+      timerRef.current = null;
+      try {
+        await tonConnectUI?.disconnect();
+      } catch {
+        // ignore disconnect errors
+      }
+      setStatus("idle");
+    }, 5 * 60 * 1000);
+  }, [tonConnectUI, stopDisconnectTimer]);
+
+  useEffect(() => {
+    if (tonConnectUI?.connected && !timerRef.current) {
+      startDisconnectTimer();
+    }
+    return () => {
+      stopDisconnectTimer();
+    };
+  }, [tonConnectUI, startDisconnectTimer, stopDisconnectTimer]);
 
   useEffect(() => {
     if (status !== "verifying" || !orderId) return;
@@ -46,8 +76,9 @@ export function TonPayButton({
 
     return () => {
       cancelled = true;
+      stopDisconnectTimer();
     };
-  }, [status, orderId, router]);
+  }, [status, orderId, router, stopDisconnectTimer]);
 
   const handlePay = async () => {
     onClick?.();
@@ -105,6 +136,7 @@ export function TonPayButton({
         if (!tonConnectUI?.connected) {
           throw new Error("Failed to connect wallet. Try again.");
         }
+        startDisconnectTimer();
       }
 
       setStatus("sending");
@@ -128,10 +160,22 @@ export function TonPayButton({
         return;
       }
       // Map common SDK errors to user-friendly copy in sentence case.
-      const message =
-        rawMessage.includes("Transaction was not sent")
-          ? "Transaction was not sent. Try again."
-          : rawMessage;
+      let message: string;
+      if (rawMessage.includes("Transaction was not sent")) {
+        message = "Transaction was not sent. Try again.";
+      } else if (
+        rawMessage.includes("rejects the action") ||
+        rawMessage.includes("Reject Request") ||
+        rawMessage.includes("user rejected")
+      ) {
+        message = "Reject Request";
+      } else {
+        // Strip raw SDK error prefix and codes, keep only the user-facing part.
+        message = rawMessage
+          .replace(/^\[TON_CONNECT_SDK_ERROR\]\s*/i, "")
+          .replace(/^[A-Za-z0-9]+\s*:\s*/, "")
+          .trim() || "An error occurred.";
+      }
       setErrorMessage(message);
       setStatus("idle");
 }
