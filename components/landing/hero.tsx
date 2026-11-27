@@ -7,7 +7,7 @@ import { siteConfig } from "@/config/site";
 import { MOTION_EASE } from "@/lib/motion";
 import { motion, type Variants } from "motion/react";
 import { InteractiveSticker } from "./interactive-sticker";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { type CSSProperties, useEffect, useState } from "react";
 
 // Keep blur on the text itself, so the banner and section shell stay sharp.
@@ -39,7 +39,7 @@ const locationTimeFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 function LocationTime() {
-  const [time, setTime] = useState("");
+  const [time, setTime] = useState(() => locationTimeFormatter.format(new Date()));
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -49,18 +49,21 @@ function LocationTime() {
   }, []);
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
+    <Popover>
+      <PopoverTrigger asChild>
         <span
           className="inline-block text-sm font-mono text-muted-foreground"
         >
           {siteConfig.personal.location.label}
         </span>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>{time}</p>
-      </TooltipContent>
-    </Tooltip>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-2">
+        <p className="text-xs text-muted-foreground">
+          {siteConfig.personal.location.timeLabel}
+        </p>
+        <p className="text-xs font-mono">{time}</p>
+      </PopoverContent>
+    </Popover>
   );
 }
 

@@ -2,15 +2,19 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 /**
- * Paths that should not be blocked by bot protection:
- * - tonconnect-manifest.json — needed by TON Connect SDK for wallet connection
- * - /api/ton/* — API for creating order, checking status, and claiming sponsor seat
- * - key.asc / key-backup.asc — PGP keys users can download
+ * Paths that should bypass bot protection:
+ * - TON Connect manifest — needed by SDK for wallet connection
+ * - PGP keys — user downloads
+ * - TON payment API — create order, check status, claim seat, verify payment
  */
 const BYPASS_PATHS = [
   "/tonconnect-manifest.json",
   "/key.asc",
   "/key-backup.asc",
+  "/api/ton/payment/create",
+  "/api/ton/payment/status",
+  "/api/ton/claim",
+  "/api/ton/verify",
 ];
 
 function isBypassPath(pathname: string): boolean {
@@ -33,8 +37,7 @@ export function middleware(request: NextRequest) {
       headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers":
-          "Content-Type, Authorization, X-API-Key",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-API-Key",
         "Access-Control-Max-Age": "86400",
       },
     });
