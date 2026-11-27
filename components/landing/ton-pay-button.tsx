@@ -159,6 +159,18 @@ export function TonPayButton({
         setStatus("idle");
         return;
       }
+      // Log wallet rejection as failed payment attempt
+      if (orderId) {
+        try {
+          await fetch("/api/ton/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderId }),
+          });
+        } catch {
+          // ignore logging errors
+        }
+      }
       // Map common SDK errors to user-friendly copy in sentence case.
       let message: string;
       if (rawMessage.includes("Transaction was not sent")) {

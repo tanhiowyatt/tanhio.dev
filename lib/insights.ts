@@ -15,7 +15,7 @@ import {
 
 const DAY_MS = 86_400_000;
 
-/** Включает тестовый отчёт с нулями вместо реальных данных PostHog. */
+/** Enables a test report with zeros instead of real PostHog data. */
 function testModeEnabled(): boolean {
   return process.env.INSIGHTS_TEST_MODE === "true";
 }

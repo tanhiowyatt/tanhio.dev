@@ -10,6 +10,7 @@ Re-verifies the payment on the server rather than trusting the frontend. */
 import { NextResponse } from "next/server";
 
 import { verifyTonPayment } from "@/lib/ton/verify";
+import { logActivity } from "@/lib/activity";
 import {
   commitLogo,
   commitSponsor,
@@ -111,6 +112,23 @@ export async function POST(request: Request) {
       409,
     );
   }
+
+  logActivity("ton_payment", {
+    ton_tx_hash: payment.txHash ?? "",
+    ton_amount_nano: payment.amountNano ?? "",
+    ton_amount_ton: payment.amountNano
+      ? Number(payment.amountNano) / 1_000_000_000
+      : 0,
+    ton_sender_address: senderAddress,
+    ton_comment: `PAY:${orderId}`,
+    payment_status: "confirmed",
+    orderId,
+    senderAddress,
+    name,
+    url,
+    paymentId: payment.txHash ?? orderId,
+    paidAt: payment.paidAt,
+  }, ip);
 
   // Commit the sponsor entry. Use tonTxHash as the dedup key.
   const tonTxHash = payment.txHash ?? orderId;

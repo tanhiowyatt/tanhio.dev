@@ -10,10 +10,11 @@ import { NextResponse } from "next/server";
 
 import { createOrderId, TON_AMOUNT_NANO } from "@/lib/ton/order";
 import { buildPaymentComment } from "@/lib/ton/verify";
+import { logActivity } from "@/lib/activity";
 
 export const dynamic = "force-dynamic";
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const ownerAddress = process.env.TON_OWNER_ADDRESS;
     if (!ownerAddress) {
@@ -26,6 +27,15 @@ export async function POST() {
     const orderId = createOrderId();
     const comment = `PAY:${orderId}`;
     const commentEncoded = buildPaymentComment(orderId);
+    const ip = request.headers.get("x-forwarded-for") ?? "unknown";
+
+    logActivity("ton_payment", {
+      payment_status: "created",
+      orderId,
+      address: ownerAddress,
+      amountNano: TON_AMOUNT_NANO,
+      amountTon: Number(TON_AMOUNT_NANO) / 1_000_000_000,
+    }, ip);
 
     return NextResponse.json({
       orderId,

@@ -40,10 +40,10 @@ const calendarVariants = {
   },
 };
 
-// Календарь рендерится статично (без скролла). Первая неделя (индекс 0) и
-// последняя неделя (weekCount - 1) не попадают в блок по ширине и пропускаются.
-// actualColumn = column + 1 смещает индекс, чтобы не рендерить неделю 0.
-// weekCount - 2 вместо weekCount - 1 убирает лишнюю неделю справа.
+// The calendar renders statically (without scrolling). The first week (index 0) and
+// the last week (weekCount - 1) fall outside the width block and are skipped.
+// actualColumn = column + 1 shifts the index to avoid rendering week 0.
+// weekCount - 2 instead of weekCount - 1 removes the extra week on the right.
 export function GitHubActivity({ calendar }: { calendar: ActivityCalendar }) {
   const [selectedIndex, setSelectedIndex] = useState(calendar.lastIndex);
   const [tooltipIndex, setTooltipIndex] = useState<number | null>(null);

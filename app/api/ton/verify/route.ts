@@ -8,6 +8,7 @@ form. */
 import { NextResponse } from "next/server";
 
 import { verifyTonPayment } from "@/lib/ton/verify";
+import { logActivity } from "@/lib/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +26,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing order id." }, { status: 400 });
   }
 
+  const ip = request.headers.get("x-forwarded-for") ?? "unknown";
   const result = await verifyTonPayment(orderId, senderAddress);
+
+  logActivity("ton_payment", {
+    payment_status: result.paid ? "confirmed" : "failed",
+    orderId,
+    senderAddress: senderAddress ?? "",
+    ...(result.paid && {
+      ton_tx_hash: result.txHash,
+      ton_amount_nano: result.amountNano,
+      ton_amount_ton: result.amountNano
+        ? Number(result.amountNano) / 1_000_000_000
+        : 0,
+      paidAt: result.paidAt,
+    }),
+  }, ip);
+
   return NextResponse.json(result);
 }
