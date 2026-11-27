@@ -1,15 +1,15 @@
 /* TON Center API verification for sponsor payments.
 
-Polls the TON Center `getTransactions` endpoint for the owner wallet address
+Polls the TON Center `transactions` endpoint for the owner wallet address
 and checks each inbound transaction against an order's `PAY:<orderId>` comment,
-the exact 5 TON amount, and a successful execution status. No frontend data
+the exact order amount, and a successful execution status. No frontend data
 is trusted — every check is done against the blockchain directly. */
 
 import "server-only";
 
-import { Address, Cell, beginCell, toNano } from "@ton/core";
+import { Address, Cell, beginCell } from "@ton/core";
 
-const TON_AMOUNT_NANO = toNano(5);
+import { TON_AMOUNT_NANO } from "@/lib/ton/order";
 
 const API_URL = process.env.TON_CENTER_API_URL ?? "https://toncenter.com/api/v3";
 const API_KEY = process.env.TON_CENTER_API_KEY;
@@ -45,21 +45,22 @@ export interface TonPaymentResult {
   lt?: string;
   paidAt?: string;
   amountNano?: string;
+  error?: string;
 }
 
 /** Parses the owner address from TON_OWNER_ADDRESS (EQ…/UQ… user-friendly format). */
-function ownerAddress(): string {
-  if (!OWNER_ADDRESS_RAW) return "";
+function ownerAddress(): Address | null {
+  if (!OWNER_ADDRESS_RAW) return null;
   try {
-    return Address.parse(OWNER_ADDRESS_RAW).toString();
+    return Address.parse(OWNER_ADDRESS_RAW);
   } catch {
-    return OWNER_ADDRESS_RAW;
+    return null;
   }
 }
 
 /**
- * Checks whether a 5 TON payment with comment `PAY:<orderId>` has arrived at
- * the owner wallet. Polls the last 100 transactions with `archival=true`.
+ * Checks whether a payment with comment `PAY:<orderId>` has arrived at
+ * the owner wallet. Polls the last 100 transactions for the owner address.
  * When `senderAddress` is given, the transaction source must match it too.
  */
 export async function verifyTonPayment(
@@ -71,9 +72,9 @@ export async function verifyTonPayment(
   const resolvedSender = senderAddress
     ? (() => {
         try {
-          return Address.parse(senderAddress).toString();
+          return Address.parse(senderAddress);
         } catch {
-          return senderAddress;
+          return undefined;
         }
       })()
     : undefined;
@@ -86,9 +87,9 @@ export async function verifyTonPayment(
   const timeout = setTimeout(() => controller.abort(), 15_000);
 
   try {
-    const url = `${API_URL}/getTransactions?address=${encodeURIComponent(
-      owner,
-    )}&limit=100&archival=true`;
+    const url = `${API_URL}/transactions?account=${encodeURIComponent(
+      owner.toString(),
+    )}&limit=100`;
 
     const response = await fetch(url, {
       signal: controller.signal,
@@ -96,21 +97,28 @@ export async function verifyTonPayment(
     }).finally(() => clearTimeout(timeout));
 
     if (!response.ok) {
-      return { paid: false, orderId };
+      return { paid: false, orderId, error: 'api_error' };
     }
 
     const data = (await response.json()) as {
       transactions?: Array<{
-        transaction_id?: { hash?: string; lt?: string };
+        hash?: string;
+        lt?: string;
+        now?: number;
+        description?: {
+          compute_ph?: {
+            exit_code?: number;
+          };
+          aborted?: boolean;
+        };
         in_msg?: {
           source?: string;
           destination?: string;
           value?: string;
-          body?: string;
+          message_content?: {
+            body?: string;
+          };
         };
-        utime?: number;
-        exit_code?: number;
-        aborted?: boolean;
       }>;
     };
 
@@ -118,44 +126,69 @@ export async function verifyTonPayment(
 
     for (const tx of txs) {
       // Must be a successful, non-aborted inbound transaction.
-      if (tx.exit_code !== 0 || tx.aborted === true) continue;
-      if (!tx.in_msg) continue;
+      const exitCode = tx.description?.compute_ph?.exit_code;
+      const aborted = tx.description?.aborted;
+      if (exitCode !== 0 || aborted === true) {
+        continue;
+      }
+      if (!tx.in_msg) {
+        continue;
+      }
 
-      // Destination must be the owner wallet.
+      // Destination must be the owner wallet. Compare by raw hash so UQ/EQ
+      // user-friendly formats of the same address match.
       const destination = tx.in_msg.destination;
-      if (!destination) continue;
+      if (!destination) {
+        continue;
+      }
+      let destAddress: Address;
       try {
-        if (Address.parse(destination).toString() !== owner) continue;
+        destAddress = Address.parse(destination);
       } catch {
+        continue;
+      }
+      const destRaw = destAddress.toRawString();
+      const ownerRaw = owner.toRawString();
+      if (destRaw !== ownerRaw) {
         continue;
       }
 
       // Source must match the sender address, if one was provided.
       if (resolvedSender) {
         const source = tx.in_msg.source;
-        if (!source) continue;
+        if (!source) {
+          continue;
+        }
+        let srcAddress: Address;
         try {
-          if (Address.parse(source).toString() !== resolvedSender) continue;
+          srcAddress = Address.parse(source);
         } catch {
+          continue;
+        }
+        if (srcAddress.toRawString() !== resolvedSender.toRawString()) {
           continue;
         }
       }
 
-      // Amount must be exactly 5 TON.
+      // Amount must match the order amount exactly.
       const value = tx.in_msg.value;
-      if (!value || BigInt(value) !== TON_AMOUNT_NANO) continue;
+      if (!value || BigInt(value) !== BigInt(TON_AMOUNT_NANO)) {
+        continue;
+      }
 
       // Comment must match PAY:<orderId>.
-      const comment = decodeComment(tx.in_msg.body);
-      if (comment !== expectedComment) continue;
+      const comment = decodeComment(tx.in_msg.message_content?.body);
+      if (comment !== expectedComment) {
+        continue;
+      }
 
       return {
         paid: true,
         orderId,
-        txHash: tx.transaction_id?.hash,
-        lt: tx.transaction_id?.lt,
-        paidAt: tx.utime
-          ? new Date(tx.utime * 1000).toISOString()
+        txHash: tx.hash,
+        lt: tx.lt,
+        paidAt: tx.now
+          ? new Date(tx.now * 1000).toISOString()
           : undefined,
         amountNano: value,
       };
@@ -163,7 +196,7 @@ export async function verifyTonPayment(
 
     return { paid: false, orderId };
   } catch {
-    return { paid: false, orderId };
+    return { paid: false, orderId, error: 'api_error' };
   }
 }
 

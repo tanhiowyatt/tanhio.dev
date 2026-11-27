@@ -22,17 +22,6 @@ import Image from "next/image";
 
 const badgeSpring = { type: "spring", duration: 0.35, bounce: 0.3 } as const;
 
-function withReferral(url: string) {
-  try {
-    const parsed = new URL(url);
-    parsed.searchParams.set("utm_source", "tanhio.dev");
-    parsed.searchParams.set("utm_medium", "sponsor");
-    return parsed.toString();
-  } catch {
-    return url;
-  }
-}
-
 export function EmitRays({ className }: { className?: string }) {
   return (
     <svg
@@ -97,7 +86,7 @@ function SponsorList({ sponsors }: { sponsors: Sponsor[] }) {
                 <TooltipTrigger asChild>
                   {url ? (
                     <motion.a
-                      href={withReferral(url)}
+                      href={url}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={sponsor.name}

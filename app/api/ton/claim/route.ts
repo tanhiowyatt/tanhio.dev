@@ -1,6 +1,6 @@
 /* Claim backend for TON sponsor payments.
 
-Verifies that a 5 TON payment with comment `PAY:<orderId>` has arrived at the
+Verifies that a payment with comment `PAY:<orderId>` has arrived at the
 owner wallet (via TON Center API), then commits the sponsor seat to
 `config/sponsors.generated.json` via the GitHub Contents API. Logo images are
 committed to `public/sponsors/`.
@@ -26,7 +26,31 @@ function error(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
 }
 
+/** Rate limiting: 5 requests per minute per IP. */
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 5;
+const rateLimitHits = new Map<string, number[]>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const hits = (rateLimitHits.get(ip) ?? []).filter(
+    (t) => now - t < RATE_LIMIT_WINDOW_MS,
+  );
+  if (hits.length >= RATE_LIMIT_MAX) {
+    rateLimitHits.set(ip, hits);
+    return true;
+  }
+  hits.push(now);
+  rateLimitHits.set(ip, hits);
+  return false;
+}
+
 export async function POST(request: Request) {
+  const ip = request.headers.get("x-forwarded-for") ?? "unknown";
+  if (isRateLimited(ip)) {
+    return error("Too many requests. Try again later.", 429);
+  }
+
   let form: FormData;
   try {
     form = await request.formData();
@@ -37,12 +61,15 @@ export async function POST(request: Request) {
   const orderId = String(form.get("orderId") ?? "").trim();
   const senderAddress = String(form.get("senderAddress") ?? "").trim();
   const name = String(form.get("name") ?? "").trim().slice(0, 60);
-  const rawUrl = String(form.get("url") ?? "").trim().slice(0, 300);
-  const logo = form.get("logo");
 
   if (!orderId) {
     return error("A payment order id is required.", 400);
   }
+  if (!senderAddress) {
+    return error("A sender address is required.", 400);
+  }
+  const rawUrl = String(form.get("url") ?? "").trim().slice(0, 300);
+  const logo = form.get("logo");
 
   let url: string | undefined;
   if (rawUrl) {
@@ -72,6 +99,12 @@ export async function POST(request: Request) {
 
   // Re-verify the payment on the blockchain before committing anything.
   const payment = await verifyTonPayment(orderId, senderAddress);
+  if (payment.error) {
+    return error(
+      "The payment service is temporarily unavailable. Try again later.",
+      503,
+    );
+  }
   if (!payment.paid) {
     return error(
       "This payment has not been confirmed on the TON network yet. Try again in a moment.",
@@ -83,17 +116,26 @@ export async function POST(request: Request) {
   const tonTxHash = payment.txHash ?? orderId;
   const date = payment.paidAt ? payment.paidAt.slice(0, 10) : new Date().toISOString().slice(0, 10);
 
-  const created = await commitSponsor({
-    paymentId: tonTxHash,
-    name: name || "Sponsor",
-    date,
-  });
+  const created = await (async () => {
+    try {
+      return await commitSponsor({
+        paymentId: tonTxHash,
+        name: name || "Sponsor",
+        date,
+      });
+    } catch {
+      return null;
+    }
+  })();
 
-  if (!created) {
-    return error("This seat has already been claimed.", 409);
-  }
   if (created === "duplicate") {
     return error("This seat has already been claimed.", 409);
+  }
+  if (!created) {
+    return error(
+      "The payment service is temporarily unavailable. Try again later.",
+      502,
+    );
   }
 
   // Apply claim fields (name, url, logo) and mark as claimed.
@@ -110,7 +152,13 @@ export async function POST(request: Request) {
     patch.logo = logoPath;
   }
 
-  const claimed = await commitSponsorClaim(tonTxHash, patch);
+  const claimed = await (async () => {
+    try {
+      return await commitSponsorClaim(tonTxHash, patch);
+    } catch {
+      return null;
+    }
+  })();
   switch (claimed) {
     case "committed":
       return NextResponse.json({ ok: true }, { status: 200 });

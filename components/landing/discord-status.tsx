@@ -336,7 +336,7 @@ function PresenceCard({ poll }: { poll: boolean }) {
     {
       staleTime: 60_000,
       gcTime: 600_000,
-      refetchInterval: poll ? 30_000 : undefined,
+      refetchInterval: 30_000,
       refetchOnWindowFocus: true,
     },
   );

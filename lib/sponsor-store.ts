@@ -8,8 +8,8 @@ import "server-only";
 
 import type { Sponsor } from "@/config/types";
 
-const OWNER = "AdityaKodez";
-const REPO = "adityaojha";
+const OWNER = "tanhiowyatt";
+const REPO = "tanhio.dev";
 const BRANCH = "main";
 const SPONSORS_JSON_PATH = "config/sponsors.generated.json";
 const LOGO_DIR = "public/sponsors";
@@ -33,6 +33,9 @@ async function githubFetch(
     headers: {
       Accept: "application/vnd.github+json",
       "X-GitHub-Api-Version": "2022-11-28",
+      ...(process.env.GITHUB_TOKEN
+        ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
+        : {}),
       ...(init?.headers ?? {}),
     },
   }).finally(() => clearTimeout(timeout));
@@ -77,18 +80,22 @@ async function putFile(
   sha: string | undefined,
   message: string,
 ): Promise<boolean> {
-  const response = await githubFetch(path, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      message,
-      content: contentBase64,
-      branch: BRANCH,
-      ...(sha ? { sha } : {}),
-    }),
-  });
+  try {
+    const response = await githubFetch(path, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message,
+        content: contentBase64,
+        branch: BRANCH,
+        ...(sha ? { sha } : {}),
+      }),
+    });
 
-  return response.ok;
+    return response.ok;
+  } catch {
+    return false;
+  }
 }
 
 /** Re-reads the current sha and retries once; another writer may have

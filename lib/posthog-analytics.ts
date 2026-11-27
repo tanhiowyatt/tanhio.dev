@@ -45,8 +45,8 @@ async function posthogQuery(query: string): Promise<Array<Array<unknown>> | null
           query,
         },
       }),
-      cache: "no-store",
-      next: { revalidate: 0 },
+      cache: "force-cache",
+      next: { revalidate: 1800 },
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) {
