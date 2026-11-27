@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 import { MOTION_EASE } from "@/lib/motion";
 import { motion, type Variants } from "motion/react";
 import { InteractiveSticker } from "./interactive-sticker";
+import { Popover as PopoverPrimitive } from "radix-ui"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { type CSSProperties, useEffect, useState } from "react";
 
@@ -40,6 +41,7 @@ const locationTimeFormatter = new Intl.DateTimeFormat("en-US", {
 
 function LocationTime() {
   const [time, setTime] = useState(() => locationTimeFormatter.format(new Date()));
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -49,19 +51,17 @@ function LocationTime() {
   }, []);
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
         <span
           className="inline-block text-sm font-mono text-muted-foreground"
         >
           {siteConfig.personal.location.label}
         </span>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-2">
-        <p className="text-xs text-muted-foreground">
-          {siteConfig.personal.location.timeLabel}
-        </p>
-        <p className="text-xs font-mono">{time}</p>
+      <PopoverContent side="top" className="w-auto rounded-md bg-foreground px-3 py-1.5 text-xs text-background">
+        <PopoverPrimitive.Arrow className="z-50 size-2.5 translate-y-[calc(-50%_-_2px)] rotate-45 rounded-[2px] bg-foreground fill-foreground" />
+        <p>{time}</p>
       </PopoverContent>
     </Popover>
   );
