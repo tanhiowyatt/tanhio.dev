@@ -83,6 +83,7 @@ export function InteractiveSticker({
         }
         transition={gestureSpring}
         onClick={soundSrc ? playSound : undefined}
+        data-sound-ignore={soundSrc ? true : undefined}
         onPointerEnter={(event) => {
           bounds.current =
             event.currentTarget.parentElement?.getBoundingClientRect() ?? null;

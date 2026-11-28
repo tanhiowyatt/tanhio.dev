@@ -43,12 +43,26 @@ function LocationTime() {
   const [time, setTime] = useState(() => locationTimeFormatter.format(new Date()));
   const [open, setOpen] = useState(false);
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    const mount = setTimeout(() => setMounted(true), 0);
     const timer = setInterval(() => {
       setTime(locationTimeFormatter.format(new Date()));
     }, 1000);
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(mount);
+      clearInterval(timer);
+    };
   }, []);
+
+  if (!mounted) {
+    return (
+      <span className="inline-block text-sm font-mono text-muted-foreground">
+        {siteConfig.personal.location.label}
+      </span>
+    );
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
